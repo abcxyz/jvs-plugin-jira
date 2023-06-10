@@ -70,7 +70,9 @@ func (v *Validator) getJiraIssue(ctx context.Context, issueIDOrKey, jiraAccount,
 	req.Header.Set("Accept", "application/json")
 
 	var jiraIssue JiraIssue
-	v.makeRequest(req, &jiraIssue)
+	if err := v.makeRequest(req, &jiraIssue); err != nil {
+		return nil, err
+	}
 
 	return &jiraIssue, nil
 }
