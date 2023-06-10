@@ -15,12 +15,112 @@
 package validator
 
 import (
-	"context"
+	"bytes"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"log"
+	"net/http"
 )
 
-type Validator struct{}
+type Validator struct {
+	// Baseurl of the jira API
+	// Example https://your-domain.atlassian.net/rest/api/3
+	baseUrl string
+}
 
-func (v *Validator) MatchIssue(ctx context.Context) error {
-	return fmt.Errorf("Unimplemented")
+type JiraIssue struct {
+	Key string `json:"key"`
+	ID  string `json:"id"`
+}
+
+type Match struct {
+	MatchedIssues []int    `json:"matchedIssues"`
+	Errors        []string `json:"errors"`
+}
+
+type MatchResult struct {
+	Matches []Match `json:"matches"`
+}
+
+func (v *Validator) MatchIssue(issueKey, jql, jiraAccount, apiToken string) (*MatchResult, error) {
+	issue, err := v.getJiraIssue(issueKey, jiraAccount, apiToken)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get jira issue %s: %w", issueKey, err)
+	}
+
+	result, err := v.matchJQL(*issue, jql, jiraAccount, apiToken)
+	if err != nil {
+		return nil, fmt.Errorf("failed to validate jira issue %s: %w", issueKey, err)
+	}
+	return result, nil
+}
+
+func (v *Validator) getJiraIssue(issueIdOrKey, jiraAccount, apiToken string) (*JiraIssue, error) {
+	// Construct get api
+	// https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issues/#api-rest-api-3-issue-issueidorkey-get
+	url := fmt.Sprintf("%s/issue/%s?fields=key,id", v.baseUrl, issueIdOrKey)
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to construct request: %w", err)
+	}
+
+	req.SetBasicAuth(jiraAccount, apiToken)
+	req.Header.Set("Accept", "application/json")
+
+	var jiraIssue JiraIssue
+	v.makeRequest(req, &jiraIssue)
+
+	return &jiraIssue, nil
+}
+
+func (v *Validator) matchJQL(issue JiraIssue, jql, jiraAccount, apiToken string) (*MatchResult, error) {
+	// Construct match api
+	// https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issue-search/#api-rest-api-3-jql-match-post
+
+	url := fmt.Sprintf("%s/jql/match", v.baseUrl)
+
+	// Create the request body
+	data := make(map[string][]string)
+	data["issueIds"] = append(data["issueIds"], issue.ID)
+	data["jqls"] = append(data["jqls"], jql)
+	body, err := json.Marshal(data)
+	if err != nil {
+		return nil, fmt.Errorf("failed to construct request body: %w", err)
+	}
+
+	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(body))
+	if err != nil {
+		log.Fatalln(err)
+		return nil, fmt.Errorf("failed to construct request: %w", err)
+	}
+
+	req.SetBasicAuth(jiraAccount, apiToken)
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Content-Type", "application/json")
+
+	var result MatchResult
+	v.makeRequest(req, &result)
+
+	return &result, nil
+}
+
+// Make request and store the data in the value pointed by respVal
+func (v *Validator) makeRequest(req *http.Request, respVal any) error {
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return fmt.Errorf("failed to make request: %w", err)
+	}
+
+	jsonBytes, err := ioutil.ReadAll(resp.Body)
+	defer resp.Body.Close()
+	if err != nil {
+		return fmt.Errorf("failed to read response: %w", err)
+	}
+
+	if err := json.Unmarshal(jsonBytes, respVal); err != nil {
+		return fmt.Errorf("failed to parse request: %w", err)
+	}
+
+	return nil
 }
