@@ -15,6 +15,7 @@
 package validator
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -42,6 +43,8 @@ func (srv *fakeJiraEndpoint) Server() *httptest.Server {
 }
 
 func TestValidation(t *testing.T) {
+	t.Parallel()
+
 	match := Match{
 		MatchedIssues: []int{1234},
 		Errors:        []string{},
@@ -59,8 +62,9 @@ func TestValidation(t *testing.T) {
 		svr.Close()
 	})
 
-	validator := Validator{baseUrl: svr.URL}
-	got, err := validator.MatchIssue("ABCD", "status NOT IN (Done)", "test@test.com", "secrets")
+	validator := Validator{baseURL: svr.URL}
+	ctx := context.Background()
+	got, err := validator.MatchIssue(ctx, "ABCD", "status NOT IN (Done)", "test@test.com", "secrets")
 	if err != nil {
 		t.Errorf("Unexpected err: %s", err)
 	}
