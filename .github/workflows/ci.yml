@@ -1,0 +1,17 @@
+name: 'ci'
+
+on:
+  push:
+    branches:
+      - 'main'
+  pull_request:
+    branches:
+      - 'main'
+  workflow_dispatch:
+
+jobs:
+  # Linting jobs - go
+  go_lint:
+    uses: 'abcxyz/pkg/.github/workflows/go-lint.yml@main' # ratchet:exclude
+    with:
+      go_version: '1.20'
