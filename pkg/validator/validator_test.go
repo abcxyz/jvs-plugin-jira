@@ -63,6 +63,9 @@ func TestValidation(t *testing.T) {
 	})
 
 	validator, err := NewValidator(svr.URL)
+	if err != nil {
+		t.Errorf("Cannot create validator: %s", err)
+	}
 	ctx := context.Background()
 	got, err := validator.MatchIssue(ctx, "ABCD", "status NOT IN (Done)", "test@test.com", "secrets")
 	if err != nil {
