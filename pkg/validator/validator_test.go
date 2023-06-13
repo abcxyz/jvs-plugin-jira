@@ -62,7 +62,7 @@ func TestValidation(t *testing.T) {
 		svr.Close()
 	})
 
-	validator := Validator{baseURL: svr.URL}
+	validator, err := NewValidator(svr.URL)
 	ctx := context.Background()
 	got, err := validator.MatchIssue(ctx, "ABCD", "status NOT IN (Done)", "test@test.com", "secrets")
 	if err != nil {
