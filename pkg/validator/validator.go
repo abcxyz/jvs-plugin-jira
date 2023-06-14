@@ -43,20 +43,24 @@ type Validator struct {
 	// httpClient is an HTTP client used for making outbound requests.
 	httpClient *http.Client
 
-	// jiraAccount is the user name used in [JIRA Basic Auth].
+	// account is the user name used in [JIRA Basic Auth].
+	//
 	// [JIRA Basic Auth]: https://developer.atlassian.com/cloud/jira/platform/basic-auth-for-rest-apis/
-	jiraAccount string
+	account string
 
 	// apiToken is the API token used in [JIRA Basic Auth].
+	//
 	// [JIRA Basic Auth]: https://developer.atlassian.com/cloud/jira/platform/basic-auth-for-rest-apis/
 	apiToken string
 
 	// jql is the [JQL] query specifying validation criteria.
+	//
 	// [JQL]: https://support.atlassian.com/jira-service-management-cloud/docs/use-advanced-search-with-jira-query-language-jql/
 	jql string
 }
 
 // jiraIssue is the representation of a [jira issue].
+//
 // [jira issue]: https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issues/#api-rest-api-3-issue-issueidorkey-get
 type jiraIssue struct {
 	Key string `json:"key"`
@@ -64,6 +68,7 @@ type jiraIssue struct {
 }
 
 // matchData contains data needed in the request body of a [match request].
+//
 // [match request]: https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issue-search/#api-rest-api-3-jql-match-post
 type matchData struct {
 	IssueIDs []string `json:"issueIds"`
@@ -71,6 +76,7 @@ type matchData struct {
 }
 
 // Match reports a single match result of the [match request].
+//
 // [match request]: https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issue-search/#api-rest-api-3-jql-match-post
 type Match struct {
 	MatchedIssues []int    `json:"matchedIssues"`
@@ -78,23 +84,24 @@ type Match struct {
 }
 
 // MatchResult reports full list of result of the [match request].
+//
 // [match request]: https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issue-search/#api-rest-api-3-jql-match-post
 type MatchResult struct {
 	Matches []*Match `json:"matches"`
 }
 
 // NewValidator creates a new validator.
-func NewValidator(baseURL, jql, jiraAccount, apiToken string) (*Validator, error) {
+func NewValidator(baseURL, jql, account, apiToken string) (*Validator, error) {
 	u, err := url.Parse(baseURL)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse baseURL %s", baseURL)
 	}
 	return &Validator{
-		baseURL:     u,
-		httpClient:  &http.Client{Timeout: 10 * time.Second},
-		jql:         jql,
-		jiraAccount: jiraAccount,
-		apiToken:    apiToken,
+		baseURL:    u,
+		httpClient: &http.Client{Timeout: 10 * time.Second},
+		jql:        jql,
+		account:    account,
+		apiToken:   apiToken,
 	}, nil
 }
 
@@ -114,8 +121,9 @@ func (v *Validator) MatchIssue(ctx context.Context, issueKey string) (*MatchResu
 
 // jiraIssue sends a request to jira endpoint and returns the jira issue.
 func (v *Validator) jiraIssue(ctx context.Context, issueIDOrKey string) (*jiraIssue, error) {
-	// Construct get issue api.
-	// https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issues/#api-rest-api-3-issue-issueidorkey-get
+	// Construct [Get Issue API].
+	//
+	// [Get Issue API]: https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issues/#api-rest-api-3-issue-issueidorkey-get
 	u := &url.URL{
 		Scheme: v.baseURL.Scheme,
 		Host:   v.baseURL.Host,
@@ -143,9 +151,9 @@ func (v *Validator) jiraIssue(ctx context.Context, issueIDOrKey string) (*jiraIs
 
 // matchJQL checks the jira issue against the JQL.
 func (v *Validator) matchJQL(ctx context.Context, issue *jiraIssue) (*MatchResult, error) {
-	// Construct match api.
-	// https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issue-search/#api-rest-api-3-jql-match-post
-
+	// Construct [Match API].
+	//
+	// [Match API]: https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issue-search/#api-rest-api-3-jql-match-post
 	u := &url.URL{
 		Scheme: v.baseURL.Scheme,
 		Host:   v.baseURL.Host,
@@ -181,7 +189,7 @@ func (v *Validator) matchJQL(ctx context.Context, issue *jiraIssue) (*MatchResul
 // makeRequest sends an HTTP request, decodes the response and stores the data
 // in the value pointed by respVal.
 func (v *Validator) makeRequest(req *http.Request, respVal any) error {
-	req.SetBasicAuth(v.jiraAccount, v.apiToken)
+	req.SetBasicAuth(v.account, v.apiToken)
 
 	resp, err := v.httpClient.Do(req)
 	if err != nil {
