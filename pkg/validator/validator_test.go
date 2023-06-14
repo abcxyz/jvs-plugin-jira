@@ -53,6 +53,7 @@ func TestValidation(t *testing.T) {
 				},
 			},
 		},
+		// TODO: add failure test cases.
 	}
 
 	for _, tc := range cases {
