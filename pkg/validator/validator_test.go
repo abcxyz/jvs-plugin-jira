@@ -19,8 +19,9 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"reflect"
 	"testing"
+
+	"github.com/google/go-cmp/cmp"
 )
 
 type fakeJiraEndpoint struct {
@@ -50,7 +51,7 @@ func TestValidation(t *testing.T) {
 		Errors:        []string{},
 	}
 	want := MatchResult{
-		Matches: []Match{match},
+		Matches: []*Match{&match},
 	}
 
 	jira := fakeJiraEndpoint{
@@ -62,16 +63,16 @@ func TestValidation(t *testing.T) {
 		svr.Close()
 	})
 
-	validator, err := NewValidator(svr.URL)
+	validator, err := NewValidator(svr.URL, "status NOT IN (Done)", "test@test.com", "secrets")
 	if err != nil {
-		t.Errorf("Cannot create validator: %s", err)
+		t.Fatalf("Cannot create validator: %v", err)
 	}
 	ctx := context.Background()
-	got, err := validator.MatchIssue(ctx, "ABCD", "status NOT IN (Done)", "test@test.com", "secrets")
+	got, err := validator.MatchIssue(ctx, "ABCD")
 	if err != nil {
 		t.Errorf("Unexpected err: %s", err)
 	}
-	if !reflect.DeepEqual(want, *got) {
-		t.Errorf("Unexpected validation result: want: %v, got: %v", want, got)
+	if diff := cmp.Diff(want, *got); diff != "" {
+		t.Errorf("Failed validation (-want,+got):\n%s", diff)
 	}
 }
