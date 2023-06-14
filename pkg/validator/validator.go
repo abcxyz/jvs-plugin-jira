@@ -107,7 +107,7 @@ func (v *Validator) MatchIssue(ctx context.Context, issueKey string) (*MatchResu
 
 	result, err := v.matchJQL(ctx, issue)
 	if err != nil {
-		return nil, fmt.Errorf("failed to validate jira issue %s: %w", issueKey, err)
+		return nil, fmt.Errorf("failed to validate jira issue %q: %w", issueKey, err)
 	}
 	return result, nil
 }
@@ -187,12 +187,12 @@ func (v *Validator) makeRequest(req *http.Request, respVal any) error {
 	if err != nil {
 		return fmt.Errorf("failed to make request: %w", err)
 	}
+	defer resp.Body.Close()
 
 	r := io.LimitReader(resp.Body, jiraResponseSizeLimitBytes)
 	if err := json.NewDecoder(r).Decode(&respVal); err != nil {
 		return fmt.Errorf("failed to decode response: %w", err)
 	}
-	defer resp.Body.Close()
 
 	return nil
 }
