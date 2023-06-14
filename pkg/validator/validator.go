@@ -94,7 +94,7 @@ type MatchResult struct {
 func NewValidator(baseURL, jql, account, apiToken string) (*Validator, error) {
 	u, err := url.Parse(baseURL)
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse baseURL %s", baseURL)
+		return nil, fmt.Errorf("failed to parse baseURL %s: %w", baseURL, err)
 	}
 	return &Validator{
 		baseURL:    u,
