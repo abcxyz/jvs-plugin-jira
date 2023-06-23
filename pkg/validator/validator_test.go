@@ -39,11 +39,9 @@ func TestValidation(t *testing.T) {
 		{
 			name: "happy_path",
 			issuesHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				w.WriteHeader(http.StatusOK)
 				fmt.Fprint(w, `{"id":"1234","self":"https://test.atlassian.net/rest/api/3/issue/1234","key":"ABCD"}`)
 			}),
 			matchHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				w.WriteHeader(http.StatusOK)
 				fmt.Fprintf(w, `{"matches":[{"matchedIssues":[1234],"errors":[]}]}`)
 			}),
 			want: &MatchResult{
@@ -58,11 +56,9 @@ func TestValidation(t *testing.T) {
 		{
 			name: "none_match_jql",
 			issuesHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				w.WriteHeader(http.StatusOK)
 				fmt.Fprint(w, `{"id":"1234","self":"https://test.atlassian.net/rest/api/3/issue/1234","key":"ABCD"}`)
 			}),
 			matchHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				w.WriteHeader(http.StatusOK)
 				fmt.Fprintf(w, `{"matches":[{"matchedIssues":[],"errors":[]}]}`)
 			}),
 			want: &MatchResult{
@@ -77,7 +73,6 @@ func TestValidation(t *testing.T) {
 		{
 			name: "invalid_match_request",
 			issuesHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				w.WriteHeader(http.StatusOK)
 				fmt.Fprint(w, `{"id":"1234","self":"https://test.atlassian.net/rest/api/3/issue/1234","key":"ABCD"}`)
 			}),
 			matchHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -85,7 +80,7 @@ func TestValidation(t *testing.T) {
 				fmt.Fprintf(w, `{"errorMessages":["There was an error parsing JSON. Check that your request body is valid."]}`)
 			}),
 			want:    nil,
-			wantErr: "jql/match, response code 400",
+			wantErr: "jql/match, expected response code 400 to be 200",
 		},
 		{
 			name: "issue_does_not_exist",
@@ -94,11 +89,10 @@ func TestValidation(t *testing.T) {
 				fmt.Fprintf(w, `{"errorMessages":["Issue does not exist or you do not have permission to see it."],"errors":{}}`)
 			}),
 			matchHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				w.WriteHeader(http.StatusOK)
 				fmt.Fprintf(w, `{"matches":[{"matchedIssues":[1234],"errors":[]}]}`)
 			}),
 			want:    nil,
-			wantErr: "issue/ABCD?fields=key%2Cid, response code 404",
+			wantErr: "issue/ABCD?fields=key%2Cid, expected response code 404 to be 200",
 		},
 	}
 

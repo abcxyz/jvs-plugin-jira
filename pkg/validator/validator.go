@@ -197,10 +197,10 @@ func (v *Validator) makeRequest(req *http.Request, respVal any) error {
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != http.StatusOK {
+	if got, want := resp.StatusCode, http.StatusOK; got != want {
 		return fmt.Errorf(
-			"failed to make request to %s, response code %d",
-			req.URL.String(), resp.StatusCode)
+			"failed to make request to %s, expected response code %d to be %d",
+			req.URL.String(), got, want)
 	}
 
 	r := io.LimitReader(resp.Body, jiraResponseSizeLimitBytes)
