@@ -100,7 +100,6 @@ func TestValidation(t *testing.T) {
 			want:    nil,
 			wantErr: "response code 404",
 		},
-		// TODO: add failure test cases.
 	}
 
 	for _, tc := range cases {
