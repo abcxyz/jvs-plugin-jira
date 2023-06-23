@@ -85,7 +85,7 @@ func TestValidation(t *testing.T) {
 				fmt.Fprintf(w, `{"errorMessages":["There was an error parsing JSON. Check that your request body is valid."]}`)
 			}),
 			want:    nil,
-			wantErr: "response code 400",
+			wantErr: "jql/match, response code 400",
 		},
 		{
 			name: "issue_does_not_exist",
@@ -98,7 +98,7 @@ func TestValidation(t *testing.T) {
 				fmt.Fprintf(w, `{"matches":[{"matchedIssues":[1234],"errors":[]}]}`)
 			}),
 			want:    nil,
-			wantErr: "response code 404",
+			wantErr: "issue/ABCD?fields=key%2Cid, response code 404",
 		},
 	}
 
