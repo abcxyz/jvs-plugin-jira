@@ -197,6 +197,12 @@ func (v *Validator) makeRequest(req *http.Request, respVal any) error {
 	}
 	defer resp.Body.Close()
 
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf(
+			"failed to make request to %s, response code %d",
+			req.URL.String(), resp.StatusCode)
+	}
+
 	r := io.LimitReader(resp.Body, jiraResponseSizeLimitBytes)
 	if err := json.NewDecoder(r).Decode(&respVal); err != nil {
 		return fmt.Errorf("failed to decode response: %w", err)
