@@ -45,7 +45,7 @@ type JiraPlugin struct {
 
 // NewJiraPlugin creates a new JiraPlugin.
 func NewJiraPlugin(ctx context.Context, cfg *PluginConfig) (*JiraPlugin, error) {
-	apiToken, err := secretVersion(ctx, cfg.ApiTokenSecretID)
+	apiToken, err := secretVersion(ctx, cfg.APITokenSecretID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch API token: %w", err)
 	}

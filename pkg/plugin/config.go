@@ -44,10 +44,10 @@ type PluginConfig struct {
 	// [JIRA Basic Auth]: https://developer.atlassian.com/cloud/jira/platform/basic-auth-for-rest-apis/
 	JiraAccount string `env:"JIRA_PLUGIN_ACCOUNT"`
 
-	// ApiTokenSecretID is the resource name of the
+	// APITokenSecretID is the resource name of the
 	// [SecretVersion][google.cloud.secretmanager.v1.SecretVersion] for the API
 	// token in the format `projects/*/secrets/*/versions/*`.
-	ApiTokenSecretID string `env:"JIRA_PLUGIN_API_TOKEN_SECRET_ID"`
+	APITokenSecretID string `env:"JIRA_PLUGIN_API_TOKEN_SECRET_ID"`
 }
 
 // Validate checks if the config is valid.
@@ -66,8 +66,8 @@ func (cfg *PluginConfig) Validate() error {
 		merr = errors.Join(merr, fmt.Errorf("empty JiraAccount"))
 	}
 
-	if cfg.ApiTokenSecretID == "" {
-		merr = errors.Join(merr, fmt.Errorf("empty ApiTokenSecretID"))
+	if cfg.APITokenSecretID == "" {
+		merr = errors.Join(merr, fmt.Errorf("empty APITokenSecretID"))
 	}
 
 	return merr
@@ -118,11 +118,11 @@ func (cfg *PluginConfig) ToFlags(set *cli.FlagSet) *cli.FlagSet {
 
 	f.StringVar(&cli.StringVar{
 		Name:    "jira-plugin-api-token-secret-id",
-		Target:  &cfg.ApiTokenSecretID,
+		Target:  &cfg.APITokenSecretID,
 		EnvVar:  "JIRA_PLUGIN_API_TOKEN_SECRET_ID",
 		Example: "projects/*/secrets/*/versions/*",
 		Usage: `
-		ApiTokenSecretID is the resource name of the
+		APITokenSecretID is the resource name of the
 		[SecretVersion][google.cloud.secretmanager.v1.SecretVersion] for the API
 		token in the format "projects/*/secrets/*/versions/*".
 		`,

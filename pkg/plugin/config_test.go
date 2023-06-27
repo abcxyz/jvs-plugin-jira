@@ -46,7 +46,7 @@ func TestPluginConfig_ToFlags(t *testing.T) {
 				JiraEndpoint:     "https://blahblah.atlassian.net/rest/api/3",
 				Jql:              "project = JRA and assignee != jsmith",
 				JiraAccount:      "abc@xyz.com",
-				ApiTokenSecretID: "projects/123456/secrets/api-token/versions/4",
+				APITokenSecretID: "projects/123456/secrets/api-token/versions/4",
 			},
 		},
 	}
@@ -84,7 +84,7 @@ func TestPluginConfig_Validate(t *testing.T) {
 				JiraEndpoint:     "https://blahblah.atlassian.net/rest/api/3",
 				Jql:              "project = JRA and assignee != jsmith",
 				JiraAccount:      "abc@xyz.com",
-				ApiTokenSecretID: "projects/123456/secrets/api-token/versions/4",
+				APITokenSecretID: "projects/123456/secrets/api-token/versions/4",
 			},
 		},
 		{
@@ -92,7 +92,7 @@ func TestPluginConfig_Validate(t *testing.T) {
 			cfg: &PluginConfig{
 				Jql:              "project = JRA and assignee != jsmith",
 				JiraAccount:      "abc@xyz.com",
-				ApiTokenSecretID: "projects/123456/secrets/api-token/versions/4",
+				APITokenSecretID: "projects/123456/secrets/api-token/versions/4",
 			},
 			wantErr: "empty JiraEndpoint",
 		},
@@ -101,7 +101,7 @@ func TestPluginConfig_Validate(t *testing.T) {
 			cfg: &PluginConfig{
 				JiraEndpoint:     "https://blahblah.atlassian.net/rest/api/3",
 				JiraAccount:      "abc@xyz.com",
-				ApiTokenSecretID: "projects/123456/secrets/api-token/versions/4",
+				APITokenSecretID: "projects/123456/secrets/api-token/versions/4",
 			},
 			wantErr: "empty JQL",
 		},
@@ -110,7 +110,7 @@ func TestPluginConfig_Validate(t *testing.T) {
 			cfg: &PluginConfig{
 				JiraEndpoint:     "https://blahblah.atlassian.net/rest/api/3",
 				Jql:              "project = JRA and assignee != jsmith",
-				ApiTokenSecretID: "projects/123456/secrets/api-token/versions/4",
+				APITokenSecretID: "projects/123456/secrets/api-token/versions/4",
 			},
 			wantErr: "empty JiraAccount",
 		},
@@ -121,7 +121,7 @@ func TestPluginConfig_Validate(t *testing.T) {
 				Jql:          "project = JRA and assignee != jsmith",
 				JiraAccount:  "abc@xyz.com",
 			},
-			wantErr: "empty ApiTokenSecretID",
+			wantErr: "empty APITokenSecretID",
 		},
 	}
 
