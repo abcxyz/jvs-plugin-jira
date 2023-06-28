@@ -32,22 +32,22 @@ type PluginConfig struct {
 	//     https://host:port/context/rest/api-name/api-version
 	//
 	// [JIRA REST API url]: https://developer.atlassian.com/server/jira/platform/rest-apis/#uri-structure
-	JIRAEndpoint string `env:"JIRA_PLUGIN_ENDPOINT"`
+	JIRAEndpoint string
 
 	// Jql is the [JQL] query specifying validation criteria.
 	//
 	// [JQL]: https://support.atlassian.com/jira-service-management-cloud/docs/use-advanced-search-with-jira-query-language-jql/
-	Jql string `env:"JIRA_PLUGIN_JQL"`
+	Jql string
 
 	// JIRAAccount is the user name used in [JIRA Basic Auth].
 	//
 	// [JIRA Basic Auth]: https://developer.atlassian.com/cloud/jira/platform/basic-auth-for-rest-apis/
-	JIRAAccount string `env:"JIRA_PLUGIN_ACCOUNT"`
+	JIRAAccount string
 
 	// APITokenSecretID is the resource name of the
 	// [SecretVersion][google.cloud.secretmanager.v1.SecretVersion] for the API
 	// token in the format `projects/*/secrets/*/versions/*`.
-	APITokenSecretID string `env:"JIRA_PLUGIN_API_TOKEN_SECRET_ID"`
+	APITokenSecretID string
 }
 
 // Validate checks if the config is valid.
