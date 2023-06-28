@@ -39,10 +39,10 @@ type PluginConfig struct {
 	// [JQL]: https://support.atlassian.com/jira-service-management-cloud/docs/use-advanced-search-with-jira-query-language-jql/
 	Jql string `env:"JIRA_PLUGIN_JQL"`
 
-	// JiraAccount is the user name used in [JIRA Basic Auth].
+	// JIRAAccount is the user name used in [JIRA Basic Auth].
 	//
 	// [JIRA Basic Auth]: https://developer.atlassian.com/cloud/jira/platform/basic-auth-for-rest-apis/
-	JiraAccount string `env:"JIRA_PLUGIN_ACCOUNT"`
+	JIRAAccount string `env:"JIRA_PLUGIN_ACCOUNT"`
 
 	// APITokenSecretID is the resource name of the
 	// [SecretVersion][google.cloud.secretmanager.v1.SecretVersion] for the API
@@ -62,8 +62,8 @@ func (cfg *PluginConfig) Validate() error {
 		merr = errors.Join(merr, fmt.Errorf("empty JQL"))
 	}
 
-	if cfg.JiraAccount == "" {
-		merr = errors.Join(merr, fmt.Errorf("empty JiraAccount"))
+	if cfg.JIRAAccount == "" {
+		merr = errors.Join(merr, fmt.Errorf("empty JIRAAccount"))
 	}
 
 	if cfg.APITokenSecretID == "" {
@@ -96,7 +96,7 @@ func (cfg *PluginConfig) ToFlags(set *cli.FlagSet) *cli.FlagSet {
 
 	f.StringVar(&cli.StringVar{
 		Name:    "jira-plugin-account",
-		Target:  &cfg.JiraAccount,
+		Target:  &cfg.JIRAAccount,
 		EnvVar:  "JIRA_PLUGIN_ACCOUNT",
 		Example: "abc@xyz.com",
 		Usage:   "The user name used in JIRA Basic Auth.",
