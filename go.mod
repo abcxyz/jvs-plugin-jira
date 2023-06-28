@@ -6,6 +6,7 @@ require (
 	github.com/abcxyz/jvs v0.0.0-20230623161235-a02ba7d38f4b // TODO update to major version
 	github.com/abcxyz/pkg v0.4.0
 	github.com/google/go-cmp v0.5.9
+	github.com/hashicorp/go-plugin v1.4.10
 )
 
 require (
@@ -25,7 +26,6 @@ require (
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-hclog v1.5.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
-	github.com/hashicorp/go-plugin v1.4.10 // indirect
 	github.com/hashicorp/yamux v0.1.1 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/lestrrat-go/blackmagic v1.0.1 // indirect
