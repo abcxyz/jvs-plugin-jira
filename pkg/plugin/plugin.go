@@ -96,11 +96,9 @@ func secretVersion(ctx context.Context, secretVersionName string) (string, error
 	defer client.Close()
 
 	// Fetch secret version.
-	resp, err := client.AccessSecretVersion(
-		ctx,
-		&secretmanagerpb.AccessSecretVersionRequest{
-			Name: secretVersionName,
-		})
+	resp, err := client.AccessSecretVersion(ctx, &secretmanagerpb.AccessSecretVersionRequest{
+		Name: secretVersionName,
+	})
 	if err != nil {
 		return "", fmt.Errorf("failed to access API token from secret manager: %w", err)
 	}
