@@ -50,7 +50,7 @@ func NewJiraPlugin(ctx context.Context, cfg *PluginConfig) (*JiraPlugin, error) 
 		return nil, fmt.Errorf("failed to fetch API token: %w", err)
 	}
 
-	v, err := validator.NewValidator(cfg.JiraEndpoint, cfg.Jql, cfg.JiraAccount, apiToken)
+	v, err := validator.NewValidator(cfg.JIRAEndpoint, cfg.Jql, cfg.JiraAccount, apiToken)
 	if err != nil {
 		return nil, fmt.Errorf("failed to instantiate validator: %w", err)
 	}

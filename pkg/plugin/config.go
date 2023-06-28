@@ -27,12 +27,12 @@ import (
 // PluginConfig defines the set over environment variables required
 // for running the plugin.
 type PluginConfig struct {
-	// JiraEndpoint is the base uri to form the [JIRA REST API uri]. It has the
+	// JIRAEndpoint is the base uri to form the [JIRA REST API uri]. It has the
 	// format of:
-	//     http://host:port/context/rest/api-name/api-version
+	//     https://host:port/context/rest/api-name/api-version
 	//
 	// [JIRA REST API url]: https://developer.atlassian.com/server/jira/platform/rest-apis/#uri-structure
-	JiraEndpoint string `env:"JIRA_PLUGIN_ENDPOINT"`
+	JIRAEndpoint string `env:"JIRA_PLUGIN_ENDPOINT"`
 
 	// Jql is the [JQL] query specifying validation criteria.
 	//
@@ -54,8 +54,8 @@ type PluginConfig struct {
 func (cfg *PluginConfig) Validate() error {
 	var merr error
 
-	if cfg.JiraEndpoint == "" {
-		merr = errors.Join(merr, fmt.Errorf("empty JiraEndpoint"))
+	if cfg.JIRAEndpoint == "" {
+		merr = errors.Join(merr, fmt.Errorf("empty JIRAEndpoint"))
 	}
 
 	if cfg.Jql == "" {
@@ -80,16 +80,10 @@ func (cfg *PluginConfig) ToFlags(set *cli.FlagSet) *cli.FlagSet {
 
 	f.StringVar(&cli.StringVar{
 		Name:    "jira-plugin-endpoint",
-		Target:  &cfg.JiraEndpoint,
+		Target:  &cfg.JIRAEndpoint,
 		EnvVar:  "JIRA_PLUGIN_ENDPOINT",
 		Example: "https://your-domain.atlassian.net/rest/api/3",
-		Usage: `
-		JiraEndpoint is the base uri to form the [JIRA REST API uri]. It has the
-		format of:
-		    http://host:port/context/rest/api-name/api-version
-		
-		[JIRA REST API url]: https://developer.atlassian.com/server/jira/platform/rest-apis/#uri-structure
-		`,
+		Usage:   "The base uri to form JIRA REST API uri.",
 	})
 
 	f.StringVar(&cli.StringVar{
@@ -97,11 +91,7 @@ func (cfg *PluginConfig) ToFlags(set *cli.FlagSet) *cli.FlagSet {
 		Target:  &cfg.Jql,
 		EnvVar:  "JIRA_PLUGIN_JQL",
 		Example: "project = JRA and assignee != jsmith",
-		Usage: `
-		Jql is the [JQL] query specifying validation criteria.
-		
-		[JQL]: https://support.atlassian.com/jira-service-management-cloud/docs/use-advanced-search-with-jira-query-language-jql/
-		`,
+		Usage:   "The JQL query specifying validation criteria for a JIRA issue.",
 	})
 
 	f.StringVar(&cli.StringVar{
@@ -109,11 +99,7 @@ func (cfg *PluginConfig) ToFlags(set *cli.FlagSet) *cli.FlagSet {
 		Target:  &cfg.JiraAccount,
 		EnvVar:  "JIRA_PLUGIN_ACCOUNT",
 		Example: "abc@xyz.com",
-		Usage: `
-		JiraAccount is the user name used in [JIRA Basic Auth].
-		
-		[JIRA Basic Auth]: https://developer.atlassian.com/cloud/jira/platform/basic-auth-for-rest-apis/
-		`,
+		Usage:   "The user name used in JIRA Basic Auth.",
 	})
 
 	f.StringVar(&cli.StringVar{
@@ -121,11 +107,7 @@ func (cfg *PluginConfig) ToFlags(set *cli.FlagSet) *cli.FlagSet {
 		Target:  &cfg.APITokenSecretID,
 		EnvVar:  "JIRA_PLUGIN_API_TOKEN_SECRET_ID",
 		Example: "projects/*/secrets/*/versions/*",
-		Usage: `
-		APITokenSecretID is the resource name of the
-		[SecretVersion][google.cloud.secretmanager.v1.SecretVersion] for the API
-		token in the format "projects/*/secrets/*/versions/*".
-		`,
+		Usage:   "The resource name of [google.cloud.secretmanager.v1.SecretVersion].",
 	})
 
 	return set

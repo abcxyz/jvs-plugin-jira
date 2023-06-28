@@ -23,7 +23,6 @@ import (
 	"github.com/abcxyz/pkg/cli"
 	"github.com/abcxyz/pkg/testutil"
 	"github.com/google/go-cmp/cmp"
-	"github.com/sethvargo/go-envconfig"
 )
 
 func TestPluginConfig_ToFlags(t *testing.T) {
@@ -31,11 +30,12 @@ func TestPluginConfig_ToFlags(t *testing.T) {
 
 	cases := []struct {
 		name       string
+		args       []string
 		envs       map[string]string
 		wantConfig *PluginConfig
 	}{
 		{
-			name: "all_values_specified",
+			name: "all_envs_specified",
 			envs: map[string]string{
 				"JIRA_PLUGIN_ENDPOINT":            "https://blahblah.atlassian.net/rest/api/3",
 				"JIRA_PLUGIN_JQL":                 "project = JRA and assignee != jsmith",
@@ -43,9 +43,92 @@ func TestPluginConfig_ToFlags(t *testing.T) {
 				"JIRA_PLUGIN_API_TOKEN_SECRET_ID": "projects/123456/secrets/api-token/versions/4",
 			},
 			wantConfig: &PluginConfig{
-				JiraEndpoint:     "https://blahblah.atlassian.net/rest/api/3",
+				JIRAEndpoint:     "https://blahblah.atlassian.net/rest/api/3",
 				Jql:              "project = JRA and assignee != jsmith",
 				JiraAccount:      "abc@xyz.com",
+				APITokenSecretID: "projects/123456/secrets/api-token/versions/4",
+			},
+		},
+		{
+			name: "all_flags_specified",
+			args: []string{
+				"-jira-plugin-endpoint", "https://blahblah.atlassian.net/rest/api/3",
+				"-jira-plugin-jql", "project = JRA and assignee != jsmith",
+				"-jira-plugin-account", "abc@xyz.com",
+				"-jira-plugin-api-token-secret-id",
+				"projects/123456/secrets/api-token/versions/4",
+			},
+			wantConfig: &PluginConfig{
+				JIRAEndpoint:     "https://blahblah.atlassian.net/rest/api/3",
+				Jql:              "project = JRA and assignee != jsmith",
+				JiraAccount:      "abc@xyz.com",
+				APITokenSecretID: "projects/123456/secrets/api-token/versions/4",
+			},
+		},
+		{
+			name: "endpoint_env",
+			envs: map[string]string{
+				"JIRA_PLUGIN_ENDPOINT": "https://blahblah.atlassian.net/rest/api/3",
+			},
+			wantConfig: &PluginConfig{
+				JIRAEndpoint: "https://blahblah.atlassian.net/rest/api/3",
+			},
+		},
+		{
+			name: "endpoint_flag",
+			args: []string{"-jira-plugin-endpoint", "https://blahblah.atlassian.net/rest/api/3"},
+			wantConfig: &PluginConfig{
+				JIRAEndpoint: "https://blahblah.atlassian.net/rest/api/3",
+			},
+		},
+		{
+			name: "jql_env",
+			envs: map[string]string{
+				"JIRA_PLUGIN_JQL": "project = JRA and assignee != jsmith",
+			},
+			wantConfig: &PluginConfig{
+				Jql: "project = JRA and assignee != jsmith",
+			},
+		},
+		{
+			name: "jql_flag",
+			args: []string{"-jira-plugin-jql", "project = JRA and assignee != jsmith"},
+			wantConfig: &PluginConfig{
+				Jql: "project = JRA and assignee != jsmith",
+			},
+		},
+		{
+			name: "account_env",
+			envs: map[string]string{
+				"JIRA_PLUGIN_ACCOUNT": "abc@xyz.com",
+			},
+			wantConfig: &PluginConfig{
+				JiraAccount: "abc@xyz.com",
+			},
+		},
+		{
+			name: "account_flag",
+			args: []string{"-jira-plugin-account", "abc@xyz.com"},
+			wantConfig: &PluginConfig{
+				JiraAccount: "abc@xyz.com",
+			},
+		},
+		{
+			name: "api_token_secret_id_env",
+			envs: map[string]string{
+				"JIRA_PLUGIN_API_TOKEN_SECRET_ID": "projects/123456/secrets/api-token/versions/4",
+			},
+			wantConfig: &PluginConfig{
+				APITokenSecretID: "projects/123456/secrets/api-token/versions/4",
+			},
+		},
+		{
+			name: "api_token_secret_id_flag",
+			args: []string{
+				"-jira-plugin-api-token-secret-id",
+				"projects/123456/secrets/api-token/versions/4",
+			},
+			wantConfig: &PluginConfig{
 				APITokenSecretID: "projects/123456/secrets/api-token/versions/4",
 			},
 		},
@@ -58,9 +141,9 @@ func TestPluginConfig_ToFlags(t *testing.T) {
 			t.Parallel()
 
 			gotConfig := &PluginConfig{}
-			set := cli.NewFlagSet(cli.WithLookupEnv(envconfig.MapLookuper(tc.envs).Lookup))
+			set := cli.NewFlagSet(cli.WithLookupEnv(cli.MapLookuper(tc.envs)))
 			set = gotConfig.ToFlags(set)
-			if err := set.Parse([]string{}); err != nil {
+			if err := set.Parse(tc.args); err != nil {
 				t.Errorf("unexpected flag set parse error: %v", err)
 			}
 			if diff := cmp.Diff(tc.wantConfig, gotConfig); diff != "" {
@@ -81,7 +164,7 @@ func TestPluginConfig_Validate(t *testing.T) {
 		{
 			name: "valid",
 			cfg: &PluginConfig{
-				JiraEndpoint:     "https://blahblah.atlassian.net/rest/api/3",
+				JIRAEndpoint:     "https://blahblah.atlassian.net/rest/api/3",
 				Jql:              "project = JRA and assignee != jsmith",
 				JiraAccount:      "abc@xyz.com",
 				APITokenSecretID: "projects/123456/secrets/api-token/versions/4",
@@ -94,12 +177,12 @@ func TestPluginConfig_Validate(t *testing.T) {
 				JiraAccount:      "abc@xyz.com",
 				APITokenSecretID: "projects/123456/secrets/api-token/versions/4",
 			},
-			wantErr: "empty JiraEndpoint",
+			wantErr: "empty JIRAEndpoint",
 		},
 		{
 			name: "empty_jql",
 			cfg: &PluginConfig{
-				JiraEndpoint:     "https://blahblah.atlassian.net/rest/api/3",
+				JIRAEndpoint:     "https://blahblah.atlassian.net/rest/api/3",
 				JiraAccount:      "abc@xyz.com",
 				APITokenSecretID: "projects/123456/secrets/api-token/versions/4",
 			},
@@ -108,7 +191,7 @@ func TestPluginConfig_Validate(t *testing.T) {
 		{
 			name: "empty_jira_account",
 			cfg: &PluginConfig{
-				JiraEndpoint:     "https://blahblah.atlassian.net/rest/api/3",
+				JIRAEndpoint:     "https://blahblah.atlassian.net/rest/api/3",
 				Jql:              "project = JRA and assignee != jsmith",
 				APITokenSecretID: "projects/123456/secrets/api-token/versions/4",
 			},
@@ -117,7 +200,7 @@ func TestPluginConfig_Validate(t *testing.T) {
 		{
 			name: "empty_api_token_secret_id",
 			cfg: &PluginConfig{
-				JiraEndpoint: "https://blahblah.atlassian.net/rest/api/3",
+				JIRAEndpoint: "https://blahblah.atlassian.net/rest/api/3",
 				Jql:          "project = JRA and assignee != jsmith",
 				JiraAccount:  "abc@xyz.com",
 			},

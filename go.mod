@@ -6,7 +6,6 @@ require (
 	github.com/abcxyz/jvs v0.0.0-20230623161235-a02ba7d38f4b // TODO update to major version
 	github.com/abcxyz/pkg v0.4.0
 	github.com/google/go-cmp v0.5.9
-	github.com/sethvargo/go-envconfig v0.9.0
 )
 
 require (
