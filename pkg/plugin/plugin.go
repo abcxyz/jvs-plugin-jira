@@ -63,8 +63,7 @@ func NewJiraPlugin(ctx context.Context, cfg *PluginConfig) (*JiraPlugin, error) 
 func (j *JiraPlugin) Validate(ctx context.Context, req *jvspb.ValidateJustificationRequest) (*jvspb.ValidateJustificationResponse, error) {
 	if got, want := req.Justification.Category, jiraCategory; got != want {
 		return nil,
-			fmt.Errorf(
-				"failed to perform validation, expected category %q to be %q",
+			fmt.Errorf("failed to perform validation, expected category %q to be %q",
 				got, want)
 	}
 
