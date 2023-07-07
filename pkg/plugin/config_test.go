@@ -177,7 +177,7 @@ func TestPluginConfig_Validate(t *testing.T) {
 				JIRAAccount:      "abc@xyz.com",
 				APITokenSecretID: "projects/123456/secrets/api-token/versions/4",
 			},
-			wantErr: "empty JIRAEndpoint",
+			wantErr: "empty JIRA_PLUGIN_ENDPOINT",
 		},
 		{
 			name: "empty_jql",
@@ -186,7 +186,7 @@ func TestPluginConfig_Validate(t *testing.T) {
 				JIRAAccount:      "abc@xyz.com",
 				APITokenSecretID: "projects/123456/secrets/api-token/versions/4",
 			},
-			wantErr: "empty JQL",
+			wantErr: "empty JIRA_PLUGIN_JQL",
 		},
 		{
 			name: "empty_jira_account",
@@ -195,7 +195,7 @@ func TestPluginConfig_Validate(t *testing.T) {
 				Jql:              "project = JRA and assignee != jsmith",
 				APITokenSecretID: "projects/123456/secrets/api-token/versions/4",
 			},
-			wantErr: "empty JIRAAccount",
+			wantErr: "empty JIRA_PLUGIN_ACCOUNT",
 		},
 		{
 			name: "empty_api_token_secret_id",
@@ -204,7 +204,7 @@ func TestPluginConfig_Validate(t *testing.T) {
 				Jql:          "project = JRA and assignee != jsmith",
 				JIRAAccount:  "abc@xyz.com",
 			},
-			wantErr: "empty APITokenSecretID",
+			wantErr: "empty JIRA_PLUGIN_API_TOKEN_SECRET_ID",
 		},
 	}
 

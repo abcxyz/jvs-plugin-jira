@@ -55,19 +55,19 @@ func (cfg *PluginConfig) Validate() error {
 	var merr error
 
 	if cfg.JIRAEndpoint == "" {
-		merr = errors.Join(merr, fmt.Errorf("empty JIRAEndpoint"))
+		merr = errors.Join(merr, fmt.Errorf("empty JIRA_PLUGIN_ENDPOINT"))
 	}
 
 	if cfg.Jql == "" {
-		merr = errors.Join(merr, fmt.Errorf("empty JQL"))
+		merr = errors.Join(merr, fmt.Errorf("empty JIRA_PLUGIN_JQL"))
 	}
 
 	if cfg.JIRAAccount == "" {
-		merr = errors.Join(merr, fmt.Errorf("empty JIRAAccount"))
+		merr = errors.Join(merr, fmt.Errorf("empty JIRA_PLUGIN_ACCOUNT"))
 	}
 
 	if cfg.APITokenSecretID == "" {
-		merr = errors.Join(merr, fmt.Errorf("empty APITokenSecretID"))
+		merr = errors.Join(merr, fmt.Errorf("empty JIRA_PLUGIN_API_TOKEN_SECRET_ID"))
 	}
 
 	return merr
