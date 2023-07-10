@@ -37,6 +37,5 @@ func main() {
 }
 
 func realMain(ctx context.Context) error {
-	cmd := &cli.ServerCommand{}
-	return cmd.Run(ctx, os.Args[1:]) //nolint:wrapcheck // Want passthrough
+	return new(cli.ServerComment).Run(ctx, os.Args[1:]) //nolint:wrapcheck // Want passthrough
 }
