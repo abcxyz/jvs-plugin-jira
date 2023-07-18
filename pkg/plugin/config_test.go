@@ -12,9 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package validator provides functions to validate jira issue against
-// validation criteria.
-
+// Package plugin provides the implementation of the JVS plugin interface.
 package plugin
 
 import (
@@ -41,12 +39,16 @@ func TestPluginConfig_ToFlags(t *testing.T) {
 				"JIRA_PLUGIN_JQL":                 "project = JRA and assignee != jsmith",
 				"JIRA_PLUGIN_ACCOUNT":             "abc@xyz.com",
 				"JIRA_PLUGIN_API_TOKEN_SECRET_ID": "projects/123456/secrets/api-token/versions/4",
+				"JIRA_PLUGIN_DISPLAY_NAME":        "Jira Issue Key",
+				"JIRA_PLUGIN_HINT":                "Jira Issue Key under JVS project",
 			},
 			wantConfig: &PluginConfig{
 				JIRAEndpoint:     "https://blahblah.atlassian.net/rest/api/3",
 				Jql:              "project = JRA and assignee != jsmith",
 				JIRAAccount:      "abc@xyz.com",
 				APITokenSecretID: "projects/123456/secrets/api-token/versions/4",
+				DisplayName:      "Jira Issue Key",
+				Hint:             "Jira Issue Key under JVS project",
 			},
 		},
 		{
@@ -163,6 +165,17 @@ func TestPluginConfig_Validate(t *testing.T) {
 	}{
 		{
 			name: "valid",
+			cfg: &PluginConfig{
+				JIRAEndpoint:     "https://blahblah.atlassian.net/rest/api/3",
+				Jql:              "project = JRA and assignee != jsmith",
+				JIRAAccount:      "abc@xyz.com",
+				APITokenSecretID: "projects/123456/secrets/api-token/versions/4",
+				DisplayName:      "Jira Issue Key",
+				Hint:             "Jira Issue Key under JVS project",
+			},
+		},
+		{
+			name: "valid_without_display_name_and_hint",
 			cfg: &PluginConfig{
 				JIRAEndpoint:     "https://blahblah.atlassian.net/rest/api/3",
 				Jql:              "project = JRA and assignee != jsmith",

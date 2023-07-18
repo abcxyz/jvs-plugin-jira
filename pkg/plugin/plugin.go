@@ -12,9 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package validator provides functions to validate jira issue against
-// validation criteria.
-
 // Package plugin provides the implementation of the JVS plugin interface.
 package plugin
 
@@ -38,9 +35,16 @@ type issueMatcher interface {
 	MatchIssue(context.Context, string) (*validator.MatchResult, error)
 }
 
+// The JiraUIData comprises the data that will be displayed. At present, it exclusively includes the displayName and hint.
+type JiraUIData struct {
+	displayName string
+	hint        string
+}
+
 // JiraPlugin is the implementation of jvspb.Validator interface.
 type JiraPlugin struct {
 	validator issueMatcher
+	uiData    JiraUIData
 }
 
 // NewJiraPlugin creates a new JiraPlugin.
@@ -54,8 +58,12 @@ func NewJiraPlugin(ctx context.Context, cfg *PluginConfig) (*JiraPlugin, error) 
 	if err != nil {
 		return nil, fmt.Errorf("failed to instantiate validator: %w", err)
 	}
+
+	d := GetUIDataFromPluginConfig(cfg)
+
 	return &JiraPlugin{
 		validator: v,
+		uiData:    d,
 	}, nil
 }
 
@@ -87,6 +95,13 @@ func (j *JiraPlugin) Validate(ctx context.Context, req *jvspb.ValidateJustificat
 	}, nil
 }
 
+func (j *JiraPlugin) GetUIData(ctx context.Context, req *jvspb.GetUIDataRequest) (*jvspb.UIData, error) {
+	return &jvspb.UIData{
+		DisplayName: j.uiData.displayName,
+		Hint:        j.uiData.hint,
+	}, nil
+}
+
 // secretVersion returns the secret data as a string.
 func secretVersion(ctx context.Context, secretVersionName string) (string, error) {
 	client, err := secretmanager.NewClient(ctx)
@@ -104,4 +119,23 @@ func secretVersion(ctx context.Context, secretVersionName string) (string, error
 	}
 
 	return string(resp.GetPayload().GetData()), nil
+}
+
+func GetUIDataFromPluginConfig(cfg *PluginConfig) JiraUIData {
+	d := cfg.DisplayName
+	if d == "" {
+		// Sets default category name to display.
+		d = "Jira Issue Key"
+	}
+
+	h := cfg.Hint
+	if h == "" {
+		// Sets default hint to display.
+		h = "Jira Issue key under JVS project"
+	}
+
+	return JiraUIData{
+		displayName: d,
+		hint:        h,
+	}
 }
