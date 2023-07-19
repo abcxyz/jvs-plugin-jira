@@ -35,16 +35,10 @@ type issueMatcher interface {
 	MatchIssue(context.Context, string) (*validator.MatchResult, error)
 }
 
-// The JiraUIData comprises the data that will be displayed. At present, it exclusively includes the displayName and hint.
-type JiraUIData struct {
-	displayName string
-	hint        string
-}
-
 // JiraPlugin is the implementation of jvspb.Validator interface.
 type JiraPlugin struct {
 	validator issueMatcher
-	uiData    JiraUIData
+	uiData    *jvspb.UIData
 }
 
 // NewJiraPlugin creates a new JiraPlugin.
@@ -59,7 +53,10 @@ func NewJiraPlugin(ctx context.Context, cfg *PluginConfig) (*JiraPlugin, error) 
 		return nil, fmt.Errorf("failed to instantiate validator: %w", err)
 	}
 
-	d := GetUIDataFromPluginConfig(cfg)
+	d := &jvspb.UIData{
+		DisplayName: cfg.DisplayName,
+		Hint:        cfg.Hint,
+	}
 
 	return &JiraPlugin{
 		validator: v,
@@ -96,10 +93,7 @@ func (j *JiraPlugin) Validate(ctx context.Context, req *jvspb.ValidateJustificat
 }
 
 func (j *JiraPlugin) GetUIData(ctx context.Context, req *jvspb.GetUIDataRequest) (*jvspb.UIData, error) {
-	return &jvspb.UIData{
-		DisplayName: j.uiData.displayName,
-		Hint:        j.uiData.hint,
-	}, nil
+	return j.uiData, nil
 }
 
 // secretVersion returns the secret data as a string.
@@ -119,23 +113,4 @@ func secretVersion(ctx context.Context, secretVersionName string) (string, error
 	}
 
 	return string(resp.GetPayload().GetData()), nil
-}
-
-func GetUIDataFromPluginConfig(cfg *PluginConfig) JiraUIData {
-	d := cfg.DisplayName
-	if d == "" {
-		// Sets default category name to display.
-		d = "Jira Issue Key"
-	}
-
-	h := cfg.Hint
-	if h == "" {
-		// Sets default hint to display.
-		h = "Jira Issue key under JVS project"
-	}
-
-	return JiraUIData{
-		displayName: d,
-		hint:        h,
-	}
 }

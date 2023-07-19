@@ -181,16 +181,16 @@ func TestPlugin_GetUIData(t *testing.T) {
 	cases := []struct {
 		name    string
 		req     *jvspb.GetUIDataRequest
-		uiData  JiraUIData
+		uiData  *jvspb.UIData
 		want    *jvspb.UIData
 		wantErr string
 	}{
 		{
 			name: "success",
 			req:  &jvspb.GetUIDataRequest{},
-			uiData: JiraUIData{
-				displayName: "Jira Issue key",
-				hint:        "Jira Issue key under JVS project",
+			uiData: &jvspb.UIData{
+				DisplayName: "Jira Issue key",
+				Hint:        "Jira Issue key under JVS project",
 			},
 			want: &jvspb.UIData{
 				DisplayName: "Jira Issue key",

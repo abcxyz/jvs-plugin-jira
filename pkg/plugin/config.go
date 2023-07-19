@@ -118,7 +118,7 @@ func (cfg *PluginConfig) ToFlags(set *cli.FlagSet) *cli.FlagSet {
 		Name:    "jira-plugin-display-name",
 		Target:  &cfg.DisplayName,
 		EnvVar:  "JIRA_PLUGIN_DISPLAY_NAME",
-		Example: "Jira Issue Key",
+		Default: "Jira Issue Key",
 		Usage:   "The display name is for display, e.g. for the web UI.",
 	})
 
@@ -126,7 +126,7 @@ func (cfg *PluginConfig) ToFlags(set *cli.FlagSet) *cli.FlagSet {
 		Name:    "jira-plugin-hint",
 		Target:  &cfg.Hint,
 		EnvVar:  "JIRA_PLUGIN_HINT",
-		Example: "Jira Issue Key under specific project",
+		Default: "Jira Issue Key under specific project",
 		Usage:   "Hint is for what value to put as the justification.",
 	})
 
