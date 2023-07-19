@@ -74,6 +74,10 @@ func (cfg *PluginConfig) Validate() error {
 		merr = errors.Join(merr, fmt.Errorf("empty JIRA_PLUGIN_API_TOKEN_SECRET_ID"))
 	}
 
+	if cfg.Hint == "" {
+		merr = errors.Join(merr, fmt.Errorf("empty JIRA_PLUGIN_HINT"))
+	}
+
 	return merr
 }
 
@@ -126,7 +130,7 @@ func (cfg *PluginConfig) ToFlags(set *cli.FlagSet) *cli.FlagSet {
 		Name:    "jira-plugin-hint",
 		Target:  &cfg.Hint,
 		EnvVar:  "JIRA_PLUGIN_HINT",
-		Default: "Jira Issue Key under specific project",
+		Example: "Jira Issue Key under specific project",
 		Usage:   "Hint is for what value to put as the justification.",
 	})
 

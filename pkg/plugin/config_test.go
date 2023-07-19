@@ -79,7 +79,6 @@ func TestPluginConfig_ToFlags(t *testing.T) {
 			wantConfig: &PluginConfig{
 				JIRAEndpoint: "https://blahblah.atlassian.net/rest/api/3",
 				DisplayName:  "Jira Issue Key",
-				Hint:         "Jira Issue Key under specific project",
 			},
 		},
 		{
@@ -88,7 +87,6 @@ func TestPluginConfig_ToFlags(t *testing.T) {
 			wantConfig: &PluginConfig{
 				JIRAEndpoint: "https://blahblah.atlassian.net/rest/api/3",
 				DisplayName:  "Jira Issue Key",
-				Hint:         "Jira Issue Key under specific project",
 			},
 		},
 		{
@@ -99,7 +97,6 @@ func TestPluginConfig_ToFlags(t *testing.T) {
 			wantConfig: &PluginConfig{
 				Jql:         "project = JRA and assignee != jsmith",
 				DisplayName: "Jira Issue Key",
-				Hint:        "Jira Issue Key under specific project",
 			},
 		},
 		{
@@ -108,7 +105,6 @@ func TestPluginConfig_ToFlags(t *testing.T) {
 			wantConfig: &PluginConfig{
 				Jql:         "project = JRA and assignee != jsmith",
 				DisplayName: "Jira Issue Key",
-				Hint:        "Jira Issue Key under specific project",
 			},
 		},
 		{
@@ -119,7 +115,6 @@ func TestPluginConfig_ToFlags(t *testing.T) {
 			wantConfig: &PluginConfig{
 				JIRAAccount: "abc@xyz.com",
 				DisplayName: "Jira Issue Key",
-				Hint:        "Jira Issue Key under specific project",
 			},
 		},
 		{
@@ -128,7 +123,6 @@ func TestPluginConfig_ToFlags(t *testing.T) {
 			wantConfig: &PluginConfig{
 				JIRAAccount: "abc@xyz.com",
 				DisplayName: "Jira Issue Key",
-				Hint:        "Jira Issue Key under specific project",
 			},
 		},
 		{
@@ -139,7 +133,6 @@ func TestPluginConfig_ToFlags(t *testing.T) {
 			wantConfig: &PluginConfig{
 				APITokenSecretID: "projects/123456/secrets/api-token/versions/4",
 				DisplayName:      "Jira Issue Key",
-				Hint:             "Jira Issue Key under specific project",
 			},
 		},
 		{
@@ -151,7 +144,6 @@ func TestPluginConfig_ToFlags(t *testing.T) {
 			wantConfig: &PluginConfig{
 				APITokenSecretID: "projects/123456/secrets/api-token/versions/4",
 				DisplayName:      "Jira Issue Key",
-				Hint:             "Jira Issue Key under specific project",
 			},
 		},
 		{
@@ -161,7 +153,6 @@ func TestPluginConfig_ToFlags(t *testing.T) {
 			},
 			wantConfig: &PluginConfig{
 				DisplayName: "jira display name",
-				Hint:        "Jira Issue Key under specific project",
 			},
 		},
 		{
@@ -171,7 +162,6 @@ func TestPluginConfig_ToFlags(t *testing.T) {
 			},
 			wantConfig: &PluginConfig{
 				DisplayName: "jira display name",
-				Hint:        "Jira Issue Key under specific project",
 			},
 		},
 		{
@@ -235,12 +225,13 @@ func TestPluginConfig_Validate(t *testing.T) {
 			},
 		},
 		{
-			name: "valid_without_display_name_and_hint",
+			name: "valid_without_display_name",
 			cfg: &PluginConfig{
 				JIRAEndpoint:     "https://blahblah.atlassian.net/rest/api/3",
 				Jql:              "project = JRA and assignee != jsmith",
 				JIRAAccount:      "abc@xyz.com",
 				APITokenSecretID: "projects/123456/secrets/api-token/versions/4",
+				Hint:             "Jira Issue Key under JVS project",
 			},
 		},
 		{
@@ -278,6 +269,16 @@ func TestPluginConfig_Validate(t *testing.T) {
 				JIRAAccount:  "abc@xyz.com",
 			},
 			wantErr: "empty JIRA_PLUGIN_API_TOKEN_SECRET_ID",
+		},
+		{
+			name: "empty_hint",
+			cfg: &PluginConfig{
+				JIRAEndpoint:     "https://blahblah.atlassian.net/rest/api/3",
+				Jql:              "project = JRA and assignee != jsmith",
+				JIRAAccount:      "abc@xyz.com",
+				APITokenSecretID: "projects/123456/secrets/api-token/versions/4",
+			},
+			wantErr: "empty JIRA_PLUGIN_HINT",
 		},
 	}
 
