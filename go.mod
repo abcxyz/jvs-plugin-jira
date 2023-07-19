@@ -3,7 +3,7 @@ module github.com/abcxyz/jvs-plugin-jira
 go 1.20
 
 require (
-	github.com/abcxyz/jvs v0.0.0-20230718165522-9c429bb50dca // TODO update to major version
+	github.com/abcxyz/jvs v0.0.0-20230719002050-8d69b4678e7d // TODO update to major version
 	github.com/abcxyz/pkg v0.4.0
 	github.com/google/go-cmp v0.5.9
 	github.com/hashicorp/go-plugin v1.4.10
