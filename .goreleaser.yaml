@@ -26,7 +26,7 @@ builds:
   -
     id: 'jiraplugin'
     main: './cmd/jiraplugin'
-    binary: 'jiraplugin'
+    binary: 'jvs-plugin-jira'
     mod_timestamp: '{{ .CommitTimestamp }}'
     flags:
       - '-a'
@@ -34,7 +34,7 @@ builds:
     ldflags:
       - '-s'
       - '-w'
-      - '-X={{ .ModulePath }}/internal/version.Name=jvsctl'
+      - '-X={{ .ModulePath }}/internal/version.Name=jvs-plugin-jira'
       - '-X={{ .ModulePath }}/internal/version.Version={{ .Version }}'
       - '-X={{ .ModulePath }}/internal/version.Commit={{ .Commit }}'
       - '-extldflags=-static'
@@ -48,14 +48,14 @@ builds:
 
 archives:
   - format: 'tar.gz'
-    name_template: 'jiraplugin_{{ .Version }}_{{ .Os }}_{{ .Arch }}'
+    name_template: 'jvs-plugin-jira_{{ .Version }}_{{ .Os }}_{{ .Arch }}'
     format_overrides:
       - goos: 'windows'
         format: 'zip'
 
 
 checksum:
-  name_template: 'jiraplugin_{{ .Version }}_SHA512SUMS'
+  name_template: 'jvs-plugin-jira_{{ .Version }}_SHA512SUMS'
   algorithm: 'sha512'
 
 
