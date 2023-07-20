@@ -67,6 +67,5 @@ changelog:
 
 # Release to github.
 release:
-  disable: true
-  # draft: false
-  # mode: 'replace'
+  draft: false
+  mode: 'replace'

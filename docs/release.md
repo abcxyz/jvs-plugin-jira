@@ -34,5 +34,6 @@ git tag -f -a v0.0.0-$(git rev-parse --short HEAD)
 
 # Use goreleaser to build the images.
 # All the images will be tagged with the git tag given earlier.
-goreleaser release --clean --skip-publish
+# Use --skip-validate flag if you are trying to release from a older commit.
+goreleaser release --clean
 ```
