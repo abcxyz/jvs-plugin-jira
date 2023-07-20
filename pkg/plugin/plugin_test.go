@@ -12,9 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package validator provides functions to validate jira issue against
-// validation criteria.
-
+// Package plugin provides the implementation of the JVS plugin interface.
 package plugin
 
 import (
@@ -172,6 +170,52 @@ func TestPlugin_Validate(t *testing.T) {
 			}
 			if diff := cmp.Diff(tc.want, got, cmpopts.IgnoreUnexported(jvspb.ValidateJustificationResponse{})); diff != "" {
 				t.Errorf("Failed validation (-want,+got):\n%s", diff)
+			}
+		})
+	}
+}
+
+func TestPlugin_GetUIData(t *testing.T) {
+	t.Parallel()
+
+	cases := []struct {
+		name    string
+		req     *jvspb.GetUIDataRequest
+		uiData  *jvspb.UIData
+		want    *jvspb.UIData
+		wantErr string
+	}{
+		{
+			name: "success",
+			req:  &jvspb.GetUIDataRequest{},
+			uiData: &jvspb.UIData{
+				DisplayName: "Jira Issue key",
+				Hint:        "Jira Issue key under JVS project",
+			},
+			want: &jvspb.UIData{
+				DisplayName: "Jira Issue key",
+				Hint:        "Jira Issue key under JVS project",
+			},
+		},
+	}
+
+	for _, tc := range cases {
+		tc := tc
+
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+
+			p := &JiraPlugin{
+				uiData: tc.uiData,
+			}
+
+			ctx := logging.WithLogger(context.Background(), logging.TestLogger(t))
+			got, err := p.GetUIData(ctx, tc.req)
+			if diff := testutil.DiffErrString(err, tc.wantErr); diff != "" {
+				t.Errorf(diff)
+			}
+			if diff := cmp.Diff(tc.want, got, cmpopts.IgnoreUnexported(jvspb.UIData{})); diff != "" {
+				t.Errorf("Failed GetUIData (-want,+got):\n%s", diff)
 			}
 		})
 	}

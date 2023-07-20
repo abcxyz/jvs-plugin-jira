@@ -12,9 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package validator provides functions to validate jira issue against
-// validation criteria.
-
 // Package plugin provides the implementation of the JVS plugin interface.
 package plugin
 
@@ -41,6 +38,7 @@ type issueMatcher interface {
 // JiraPlugin is the implementation of jvspb.Validator interface.
 type JiraPlugin struct {
 	validator issueMatcher
+	uiData    *jvspb.UIData
 }
 
 // NewJiraPlugin creates a new JiraPlugin.
@@ -54,8 +52,15 @@ func NewJiraPlugin(ctx context.Context, cfg *PluginConfig) (*JiraPlugin, error) 
 	if err != nil {
 		return nil, fmt.Errorf("failed to instantiate validator: %w", err)
 	}
+
+	d := &jvspb.UIData{
+		DisplayName: cfg.DisplayName,
+		Hint:        cfg.Hint,
+	}
+
 	return &JiraPlugin{
 		validator: v,
+		uiData:    d,
 	}, nil
 }
 
@@ -85,6 +90,10 @@ func (j *JiraPlugin) Validate(ctx context.Context, req *jvspb.ValidateJustificat
 		Valid:   len(result.Matches[0].MatchedIssues) == 1,
 		Warning: result.Matches[0].Errors,
 	}, nil
+}
+
+func (j *JiraPlugin) GetUIData(ctx context.Context, req *jvspb.GetUIDataRequest) (*jvspb.UIData, error) {
+	return j.uiData, nil
 }
 
 // secretVersion returns the secret data as a string.

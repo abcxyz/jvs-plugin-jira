@@ -12,9 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package validator provides functions to validate jira issue against
-// validation criteria.
-
+// Package plugin provides the implementation of the JVS plugin interface.
 package plugin
 
 import (
@@ -48,6 +46,12 @@ type PluginConfig struct {
 	// [SecretVersion][google.cloud.secretmanager.v1.SecretVersion] for the API
 	// token in the format `projects/*/secrets/*/versions/*`.
 	APITokenSecretID string
+
+	// DisplaNname is for display, e.g. for the web UI.
+	DisplayName string
+
+	// Hint is for what value to put as the justification.
+	Hint string
 }
 
 // Validate checks if the config is valid.
@@ -68,6 +72,10 @@ func (cfg *PluginConfig) Validate() error {
 
 	if cfg.APITokenSecretID == "" {
 		merr = errors.Join(merr, fmt.Errorf("empty JIRA_PLUGIN_API_TOKEN_SECRET_ID"))
+	}
+
+	if cfg.Hint == "" {
+		merr = errors.Join(merr, fmt.Errorf("empty JIRA_PLUGIN_HINT"))
 	}
 
 	return merr
@@ -108,6 +116,22 @@ func (cfg *PluginConfig) ToFlags(set *cli.FlagSet) *cli.FlagSet {
 		EnvVar:  "JIRA_PLUGIN_API_TOKEN_SECRET_ID",
 		Example: "projects/*/secrets/*/versions/*",
 		Usage:   "The resource name of [google.cloud.secretmanager.v1.SecretVersion].",
+	})
+
+	f.StringVar(&cli.StringVar{
+		Name:    "jira-plugin-display-name",
+		Target:  &cfg.DisplayName,
+		EnvVar:  "JIRA_PLUGIN_DISPLAY_NAME",
+		Default: "Jira Issue Key",
+		Usage:   "The display name is for display, e.g. for the web UI.",
+	})
+
+	f.StringVar(&cli.StringVar{
+		Name:    "jira-plugin-hint",
+		Target:  &cfg.Hint,
+		EnvVar:  "JIRA_PLUGIN_HINT",
+		Example: "Jira Issue Key under specific project",
+		Usage:   "Hint is for what value to put as the justification.",
 	})
 
 	return set
