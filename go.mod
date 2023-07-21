@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/abcxyz/jvs v0.0.0-20230719002050-8d69b4678e7d // TODO update to major version
-	github.com/abcxyz/pkg v0.4.0
+	github.com/abcxyz/pkg v0.5.1-0.20230721184008-3bacc31f6871
 	github.com/google/go-cmp v0.5.9
 	github.com/hashicorp/go-plugin v1.4.10
 )
@@ -23,9 +23,7 @@ require (
 	github.com/google/s2a-go v0.1.4 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.2.5 // indirect
 	github.com/googleapis/gax-go/v2 v2.12.0 // indirect
-	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-hclog v1.5.0 // indirect
-	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/hashicorp/yamux v0.1.1 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/lestrrat-go/blackmagic v1.0.1 // indirect
@@ -39,8 +37,8 @@ require (
 	github.com/mitchellh/go-testing-interface v1.14.1 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/oklog/run v1.1.0 // indirect
-	github.com/posener/complete/v2 v2.0.1-alpha.13 // indirect
-	github.com/posener/script v1.1.5 // indirect
+	github.com/posener/complete/v2 v2.1.0 // indirect
+	github.com/posener/script v1.2.0 // indirect
 	github.com/segmentio/asm v1.2.0 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.uber.org/atomic v1.11.0 // indirect
