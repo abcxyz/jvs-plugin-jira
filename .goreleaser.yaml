@@ -22,6 +22,7 @@ before:
   hooks:
     - 'go mod tidy'
 
+# Duplicate the build from .goreleaser.docker.yaml.
 builds:
   -
     id: 'jiraplugin'
