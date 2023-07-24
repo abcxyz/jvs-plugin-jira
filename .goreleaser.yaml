@@ -25,7 +25,7 @@ before:
 # Duplicate the build from .goreleaser.docker.yaml.
 builds:
   -
-    id: 'jiraplugin'
+    id: 'jvs-plugin-jira'
     main: './cmd/jiraplugin'
     binary: 'jvs-plugin-jira'
     mod_timestamp: '{{ .CommitTimestamp }}'
