@@ -42,7 +42,7 @@ git add . && git commit -m "local changes"
 git tag -f -a v0.0.0-$(git rev-parse --short HEAD)
 
 # goreleaser will tag the image with the git tag, optionally, override it by:
-DOCKER_TAG=mytag
+export DOCKER_TAG=mytag
 
 # Use goreleaser to build the images.
 # All the images will be tagged with the git tag given earlier.
