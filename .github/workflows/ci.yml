@@ -11,7 +11,13 @@ on:
   workflow_call:
 
 jobs:
-  # Linting jobs - go
+  # Linting jobs - terraform, go
+  terraform_lint:
+    uses: 'abcxyz/pkg/.github/workflows/terraform-lint.yml@main' # ratchet:exclude
+    with:
+      directory: 'terraform'
+      terraform_version: '1.2'
+
   go_lint:
     uses: 'abcxyz/pkg/.github/workflows/go-lint.yml@main' # ratchet:exclude
     with:
