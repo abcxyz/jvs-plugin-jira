@@ -41,5 +41,7 @@ export DOCKER_TAG=mytag
 # Use goreleaser to build the images.
 # All the images will be tagged with the git tag given earlier.
 # Use --skip-validate flag if you are trying to release from a older commit.
+# To use a new JVS release, update the base image to a new version in 
+# .goreleaser.docker.yaml.
 goreleaser release -f .goreleaser.docker.yaml --clean
 ```
