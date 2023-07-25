@@ -26,12 +26,6 @@ Or if you want to build/push images for local development.
 # Set the container registry for the images, for example:
 export CONTAINER_REGISTRY=us-docker.pkg.dev/my-project/images
 
-# Set the JVS docker image tag, for example:
-export JVS_DOCKER_TAG="0.0.5"
-
-# Set the plugin directory.
-export PLUGIN_DIR="/var/jvs/plugins"
-
 # goreleaser expects a "clean" repo to release so commit any local changes if
 # needed.
 git add . && git commit -m "local changes"

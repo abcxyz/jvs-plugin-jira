@@ -1,13 +1,6 @@
-# The jvs image.
-ARG JVS_IMAGE
+FROM us-docker.pkg.dev/abcxyz-artifacts/docker-images/jvsctl:0.0.5
 
-FROM ${JVS_IMAGE}
-
-# The folder should be consistent with JustificationConfig.PluginDir.
-# https://github.com/abcxyz/jvs/blob/main/pkg/config/justification_config.go#L49
-ARG PLUGIN_DIR
-
-COPY jvs-plugin-jira ${PLUGIN_DIR}/jvs-plugin-jira
+COPY jvs-plugin-jira /var/jvs/plugins/jvs-plugin-jira
 
 # Normally we would set this to run as "nobody". But goreleaser builds the
 # binary locally and sometimes it will mess up the permission and cause "exec

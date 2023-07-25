@@ -67,8 +67,6 @@ dockers:
       - '--label=org.opencontainers.image.source={{ .GitURL }}'
       - '--label=org.opencontainers.image.title=jvs-plugin-jira'
       - '--label=org.opencontainers.image.version={{ .Version }}'
-      - '--build-arg=PLUGIN_DIR={{ .Env.PLUGIN_DIR }}'
-      - '--build-arg=JVS_IMAGE=us-docker.pkg.dev/abcxyz-artifacts/docker-images/jvsctl:{{ .Env.JVS_DOCKER_TAG }}-amd64'
 
   -
     ids:
@@ -89,8 +87,6 @@ dockers:
       - '--label=org.opencontainers.image.source={{ .GitURL }}'
       - '--label=org.opencontainers.image.title=jvs-plugin-jira'
       - '--label=org.opencontainers.image.version={{ .Version }}'
-      - '--build-arg=PLUGIN_DIR={{ .Env.PLUGIN_DIR }}'
-      - '--build-arg=JVS_IMAGE=us-docker.pkg.dev/abcxyz-artifacts/docker-images/jvsctl:{{ .Env.JVS_DOCKER_TAG }}-arm64'
 
 docker_manifests:
   -
