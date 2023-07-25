@@ -23,6 +23,9 @@ git push origin $REL_VER
 Or if you want to build/push images for local development.
 
 ```sh
+# Set the container registry for the images, for example:
+export CONTAINER_REGISTRY=us-docker.pkg.dev/my-project/images
+
 # goreleaser expects a "clean" repo to release so commit any local changes if
 # needed.
 git add . && git commit -m "local changes"
@@ -32,8 +35,13 @@ git add . && git commit -m "local changes"
 # DON'T push the tag if you're not releasing.
 git tag -f -a v0.0.0-$(git rev-parse --short HEAD)
 
+# goreleaser will tag the image with the git tag, optionally, override it by:
+export DOCKER_TAG=mytag
+
 # Use goreleaser to build the images.
 # All the images will be tagged with the git tag given earlier.
 # Use --skip-validate flag if you are trying to release from a older commit.
-goreleaser release --clean
+# To use a new JVS release, update the base image to a new version in 
+# .goreleaser.docker.yaml.
+goreleaser release -f .goreleaser.docker.yaml --clean
 ```
