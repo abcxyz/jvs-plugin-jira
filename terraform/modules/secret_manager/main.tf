@@ -45,7 +45,10 @@ resource "google_secret_manager_secret_version" "jira_api_token_version" {
   lifecycle {
     ignore_changes = [
       enabled,
-      secret_data
+
+      # Ignore secret data so Terraform won't reset the secret.
+      # Operator will need to put the JIRA credential into the secret manually.
+      secret_data,
     ]
   }
 }
