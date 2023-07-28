@@ -8,7 +8,7 @@ env:
   # .goreleaser.docker.yaml reads CONTAINER_REGISTRY
   CONTAINER_REGISTRY: 'us-docker.pkg.dev/abcxyz-artifacts/docker-images'
   WIF_PROVIDER: 'projects/733158008617/locations/global/workloadIdentityPools/gh-automation-p-e75732/providers/gh-automation-p-e75732'
-  WIF_SERVICE_ACCOUNT: 'serviceAccount:gh-automation-p-sa@gh-jvs-plugin-jira-p-523320.iam.gserviceaccount.com'
+  WIF_SERVICE_ACCOUNT: 'gh-automation-p-sa@gh-jvs-plugin-jira-p-523320.iam.gserviceaccount.com'
 
 # Don't cancel in progress since we don't want to have half-baked release.
 concurrency: '${{ github.workflow }}-${{ github.head_ref || github.ref }}-release'
