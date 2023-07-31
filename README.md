@@ -36,6 +36,8 @@ module "jvs" {
   # The cloud app id for jvs api service.
   prober_audience = "https://example-api-jvs-cloud-run.run.app"
 
+  # Specify the plugin environment variables. See the file below for details:
+  # https://github.com/abcxyz/jvs-plugin-jira/blob/main/pkg/plugin/config.go
   plugin_envvars = {
     "JIRA_PLUGIN_ENDPOINT" : "https://blahblah.atlassian.net/rest/api/3",
     "JIRA_PLUGIN_JQL" : "project = JRA and assignee != jsmith",
