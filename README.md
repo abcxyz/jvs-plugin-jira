@@ -33,7 +33,7 @@ module "jvs" {
 
   jvs_prober_image = "us-docker.pkg.dev/abcxyz-artifacts/docker-images/jvs-prober:0.0.5-amd64"
 
-  # The cloud run url for jvs api service or app address.
+  # The cloud app id for jvs api service.
   prober_audience = "https://example-api-jvs-cloud-run.run.app"
 
   plugin_envvars = {
