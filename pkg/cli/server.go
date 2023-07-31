@@ -59,7 +59,7 @@ func (c *ServerCommand) Run(ctx context.Context, args []string) error {
 	goplugin.Serve(&goplugin.ServeConfig{
 		HandshakeConfig: jvspb.Handshake,
 		Plugins: map[string]goplugin.Plugin{
-			"jvs-plugin-jira": jvspb.ValidatorPlugin{Impl: p},
+			"jvs-plugin-jira": &jvspb.ValidatorPlugin{Impl: p},
 		},
 
 		// A non-nil value here enables gRPC serving for this plugin.
