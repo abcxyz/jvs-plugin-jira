@@ -41,7 +41,7 @@ module "jvs" {
   plugin_envvars = {
     "JIRA_PLUGIN_ENDPOINT" : "https://blahblah.atlassian.net/rest/api/3",
     "JIRA_PLUGIN_JQL" : "project = JRA and assignee != jsmith",
-    "JIRA_PLUGIN_ACCOUNT" : "abc@xyz.com",
+    "JIRA_PLUGIN_ACCOUNT" : "jvs-jira-bot@example.com",
     "JIRA_PLUGIN_API_TOKEN_SECRET_ID" : "projects/123456/secrets/api-token/versions/4",
     "JIRA_PLUGIN_DISPLAY_NAME" : "Jira Issue Key",
     "JIRA_PLUGIN_HINT" : "Jira Issue Key under JVS project",
