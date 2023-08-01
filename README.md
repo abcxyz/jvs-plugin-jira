@@ -13,7 +13,7 @@ how to build your own Terraform from scratch.
 
 ```terraform
 module "jvs" {
-  source     = "git::https://github.com/abcxyz/jvs.git//terraform/e2e?ref=main" # this should be pinned to the SHA desired
+  source     = "git::https://github.com/abcxyz/jvs-plugin-jira.git//terraform/e2e?ref=main" # this should be pinned to the SHA desired
   project_id = "YOUR_PROJECT_ID"
 
   # Specify who can access JVS.
@@ -33,18 +33,13 @@ module "jvs" {
 
   jvs_prober_image = "us-docker.pkg.dev/abcxyz-artifacts/docker-images/jvs-prober:0.0.5-amd64"
 
-  # The cloud app id for jvs api service.
-  prober_audience = "https://example-api-jvs-cloud-run.run.app"
-
   # Specify the plugin environment variables. See the file below for details:
   # https://github.com/abcxyz/jvs-plugin-jira/blob/main/pkg/plugin/config.go
-  plugin_envvars = {
-    "JIRA_PLUGIN_ENDPOINT" : "https://blahblah.atlassian.net/rest/api/3",
-    "JIRA_PLUGIN_JQL" : "project = ABC and assignee != jsmith",
-    "JIRA_PLUGIN_ACCOUNT" : "jvs-jira-bot@example.com",
-    "JIRA_PLUGIN_API_TOKEN_SECRET_ID" : "projects/123456/secrets/api-token/versions/4",
-    "JIRA_PLUGIN_DISPLAY_NAME" : "Jira Issue Key",
-    "JIRA_PLUGIN_HINT" : "Jira Issue Key under JVS project",
-  }
+
+  jira_plugin_endpoint = "https://blahblah.atlassian.net/rest/api/3",
+  jira_plugin_jql = "project = ABC and assignee != jsmith",
+  jira_plugin_account = "jvs-jira-bot@example.com",
+  jira_plugin_display_name = "Jira Issue Key",
+  jira_plugin_hint = "Jira Issue Key under JVS project",
 }
 ```
