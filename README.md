@@ -13,7 +13,7 @@ how to build your own Terraform from scratch.
 
 ```terraform
 module "jvs" {
-  source     = "git::https://github.com/abcxyz/jvs-plugin-jira.git//terraform/e2e?ref=main" # this should be pinned to the SHA desired
+  source     = "git::https://github.com/abcxyz/jvs-plugin-jira.git//terraform/example?ref=main" # this should be pinned to the SHA desired
   project_id = "YOUR_PROJECT_ID"
 
   # Specify who can access JVS.

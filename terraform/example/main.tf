@@ -53,9 +53,19 @@ module "jira_api_token" {
   project_id = var.project_id
 
   secret_id = "jira_api_token"
+}
 
-  jira_api_token_accessors = [
+resource "google_secret_manager_secret_iam_member" "jira_api_token_accessor" {
+  for_each = toset([
     "serviceAccount:${module.jvs.jvs_api_service_account_email}",
     "serviceAccount:${module.jvs.jvs_ui_service_account_email}",
-  ]
+  ])
+
+  project = var.project_id
+
+  secret_id = module.jira_api_token.secret_id
+
+  role = "roles/secretmanager.secretAccessor"
+
+  member = each.value
 }
