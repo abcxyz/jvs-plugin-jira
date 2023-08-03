@@ -22,6 +22,19 @@ git push origin $REL_VER
 
 Or if you want to build/push images for local development.
 
+**1.  Prepare JVS image**
+
+Pre-built JVS release images can be found from `us-docker.pkg.dev/abcxyz-artifacts/docker-images`. Please ensure to select the
+image compatible with your JIRA plugin.
+
+If you want to build a JVS image for local development, follow [this guidance](https://github.com/abcxyz/jvs/blob/main/docs/release.md#manually-release-images).
+
+**2.  Overlay JIRA plugin image**
+
+Update [Dockerfile](https://github.com/abcxyz/jvs-plugin-jira/blob/main/Dockerfile)
+accordingly to point to the JVS image, then run the commands below to manually
+build the image.
+
 ```sh
 # Set the container registry for the images, for example:
 export CONTAINER_REGISTRY=us-docker.pkg.dev/my-project/images
