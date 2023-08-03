@@ -48,7 +48,7 @@ module "jvs" {
 }
 
 module "jira_api_token" {
-  source = "../modules/secret_manager"
+  source = "git::https://github.com/abcxyz/jvs-plugin-jira.git//terraform/modules/secret_manager?ref=5e0aa7cab1172143aecc63e514b97c045a00622d"
 
   project_id = "YOUR_PROJECT_ID"
 
@@ -56,10 +56,10 @@ module "jira_api_token" {
 }
 
 resource "google_secret_manager_secret_iam_member" "jira_api_token_accessor" {
-  for_each = toset([
-    "serviceAccount:${module.jvs.jvs_api_service_account_email}",
-    "serviceAccount:${module.jvs.jvs_ui_service_account_email}",
-  ])
+  for_each = {
+    api_sa = "serviceAccount:${module.jvs.jvs_api_service_account_email}"
+    ui_sa  = "serviceAccount:${module.jvs.jvs_ui_service_account_email}"
+  }
 
   project = "YOUR_PROJECT_ID"
 
@@ -77,5 +77,5 @@ resource "google_secret_manager_secret_iam_member" "jira_api_token_admin" {
 
   role = "roles/secretmanager.admin"
 
-  member = "user:api-token-admin-group@example.com"
+  member = "group:jira-api-token-admins@example.com"
 }
