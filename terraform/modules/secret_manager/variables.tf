@@ -30,25 +30,3 @@ variable "labels" {
   type        = map(string)
   default     = {}
 }
-
-variable "jira_api_token_accessors" {
-  description = <<EOT
-    List of IAM members with the secret manager secret accessor role. These users will be
-    given the role "roles/secretmanager.secretAccessor". Please reference
-    https://cloud.google.com/iam/docs/overview#cloud-iam-policy
-    for the format for member identifiers.
-  EOT
-  type        = list(string)
-  default     = []
-}
-
-variable "jira_api_token_admin" {
-  description = <<EOT
-    List of IAM members with the secret manager admin role. These users will be
-    given the role "roles/secretmanager.admin". Please reference
-    https://cloud.google.com/iam/docs/overview#cloud-iam-policy
-    for the format for member identifiers.
-  EOT
-  type        = list(string)
-  default     = []
-}

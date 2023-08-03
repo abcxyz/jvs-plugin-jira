@@ -15,42 +15,42 @@
 module "jvs" {
   source = "git::https://github.com/abcxyz/jvs.git//terraform/e2e?ref=main" # this should be pinned to the SHA desired
 
-  project_id = var.project_id
+  project_id = "YOUR_PROJECT_ID"
 
   # Specify who can access JVS.
-  jvs_invoker_members = var.jvs_invoker_members
+  jvs_invoker_members = ["user:foo@example.com"]
 
   # Use your own domain.
-  jvs_api_domain = var.jvs_api_domain
-  jvs_ui_domain  = var.jvs_ui_domain
+  jvs_api_domain = "api.jvs.example.com"
+  jvs_ui_domain  = "web.jvs.example.com"
 
-  iap_support_email = var.iap_support_email
+  iap_support_email = "support@example.com"
 
-  jvs_container_image = var.jvs_container_image
+  jvs_container_image = "us-docker.pkg.dev/abcxyz-artifacts/docker-images/jvsctl:0.0.5-amd64"
 
 
   # Specify the Email address where alert notifications send to.
-  notification_channel_email = var.notification_channel_email
+  notification_channel_email = "foo@example.com"
 
-  jvs_prober_image = var.jvs_prober_image
+  jvs_prober_image = "us-docker.pkg.dev/abcxyz-artifacts/docker-images/jvs-prober:0.0.5-amd64"
 
   # Specify the plugin environment variables. See the file below for details:
   # https://github.com/abcxyz/jvs-plugin-jira/blob/main/pkg/plugin/config.go
   plugin_envvars = {
-    "JIRA_PLUGIN_ENDPOINT" : var.jira_plugin_endpoint,
-    "JIRA_PLUGIN_JQL" : var.jira_plugin_jql,
-    "JIRA_PLUGIN_ACCOUNT" : var.jira_plugin_account,
+    "JIRA_PLUGIN_ENDPOINT" : "https://blahblah.atlassian.net/rest/api/3",
+    "JIRA_PLUGIN_JQL" : "project = ABC and assignee != jsmith",
+    "JIRA_PLUGIN_ACCOUNT" : "jvs-jira-bot@example.com",
     # Update to the correct version when the real API token is stored.
     "JIRA_PLUGIN_API_TOKEN_SECRET_ID" : module.jira_api_token.secret_version_name,
-    "JIRA_PLUGIN_DISPLAY_NAME" : var.jira_plugin_display_name,
-    "JIRA_PLUGIN_HINT" : var.jira_plugin_hint,
+    "JIRA_PLUGIN_DISPLAY_NAME" : "Jira Issue Key",
+    "JIRA_PLUGIN_HINT" : "Jira Issue Key under JVS project",
   }
 }
 
 module "jira_api_token" {
   source = "../modules/secret_manager"
 
-  project_id = var.project_id
+  project_id = "YOUR_PROJECT_ID"
 
   secret_id = "jira_api_token"
 }
@@ -61,11 +61,21 @@ resource "google_secret_manager_secret_iam_member" "jira_api_token_accessor" {
     "serviceAccount:${module.jvs.jvs_ui_service_account_email}",
   ])
 
-  project = var.project_id
+  project = "YOUR_PROJECT_ID"
 
   secret_id = module.jira_api_token.secret_id
 
   role = "roles/secretmanager.secretAccessor"
 
   member = each.value
+}
+
+resource "google_secret_manager_secret_iam_member" "jira_api_token_admin" {
+  project = "YOUR_PROJECT_ID"
+
+  secret_id = module.jira_api_token.secret_id
+
+  role = "roles/secretmanager.admin"
+
+  member = "user:api-token-admin-group@example.com"
 }

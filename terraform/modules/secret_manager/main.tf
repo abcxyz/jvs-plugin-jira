@@ -52,27 +52,3 @@ resource "google_secret_manager_secret_version" "jira_api_token_version" {
     ]
   }
 }
-
-resource "google_secret_manager_secret_iam_member" "jira_api_token_accessor" {
-  for_each = toset(var.jira_api_token_accessors)
-
-  project = var.project_id
-
-  secret_id = google_secret_manager_secret.jira_api_token.secret_id
-
-  role = "roles/secretmanager.secretAccessor"
-
-  member = each.value
-}
-
-resource "google_secret_manager_secret_iam_member" "jira_api_token_admin" {
-  for_each = toset(var.jira_api_token_admin)
-
-  project = var.project_id
-
-  secret_id = google_secret_manager_secret.jira_api_token.secret_id
-
-  role = "roles/secretmanager.admin"
-
-  member = each.value
-}
