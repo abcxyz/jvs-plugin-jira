@@ -7,6 +7,11 @@ We leverage [goreleaser](https://goreleaser.com/) for SCM (GitHub) release.
 
 ## New Release
 
+1.   If a new JVS base image is needed, update [Dockerfile](https://github.com/abcxyz/jvs-plugin-jira/blob/main/Dockerfile)
+to point to a new JVS base image, and merge the PR.
+
+2.   Run the commands below to cut the release.
+
 ```sh
 # The version you're going to release.
 REL_VER=v0.0.x
