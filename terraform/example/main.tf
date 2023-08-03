@@ -48,7 +48,8 @@ module "jvs" {
 }
 
 module "jira_api_token" {
-  source = "git::https://github.com/abcxyz/jvs-plugin-jira.git//terraform/modules/secret_manager?ref=5e0aa7cab1172143aecc63e514b97c045a00622d"
+  # Pin to proper version.
+  source = "git::https://github.com/abcxyz/jvs-plugin-jira.git//terraform/modules/secret_manager?ref=5c0eb018b293c3be3cf0e6a572f190e66c6e9f66"
 
   project_id = "YOUR_PROJECT_ID"
 
