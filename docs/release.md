@@ -29,7 +29,7 @@ Or if you want to build/push images for local development.
 
 **1.  Prepare JVS image**
 
-Pre-built JVS release images can be found from `us-docker.pkg.dev/abcxyz-artifacts/docker-images`. Please ensure to select the
+Pre-built JVS release images can be found from `us-docker.pkg.dev/abcxyz-artifacts/docker-images/jvsctl`. Please ensure to select the
 image compatible with your JIRA plugin.
 
 If you want to build a JVS image for local development, follow [this guidance](https://github.com/abcxyz/jvs/blob/main/docs/release.md#manually-release-images).
