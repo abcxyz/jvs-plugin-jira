@@ -4,13 +4,13 @@ go 1.20
 
 require (
 	github.com/abcxyz/jvs v0.0.0-20230719002050-8d69b4678e7d // TODO update to major version
-	github.com/abcxyz/pkg v0.5.1-0.20230721184008-3bacc31f6871
+	github.com/abcxyz/pkg v0.6.1-0.20230816030342-4fa9e5955bc1
 	github.com/google/go-cmp v0.5.9
 	github.com/hashicorp/go-plugin v1.4.10
 )
 
 require (
-	cloud.google.com/go/compute v1.21.0 // indirect
+	cloud.google.com/go/compute v1.22.0 // indirect
 	cloud.google.com/go/compute/metadata v0.2.3 // indirect
 	cloud.google.com/go/iam v1.1.1 // indirect
 	cloud.google.com/go/secretmanager v1.11.1
@@ -53,7 +53,7 @@ require (
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto v0.0.0-20230711160842-782d3b101e98 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20230711160842-782d3b101e98 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20230711160842-782d3b101e98 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20230726155614-23370e0ffb3e // indirect
 	google.golang.org/grpc v1.56.2 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect
 )
