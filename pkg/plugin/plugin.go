@@ -18,6 +18,7 @@ package plugin
 import (
 	"context"
 	"fmt"
+	"strconv"
 
 	secretmanager "cloud.google.com/go/secretmanager/apiv1"
 	"cloud.google.com/go/secretmanager/apiv1/secretmanagerpb"
@@ -84,10 +85,21 @@ func (j *JiraPlugin) Validate(ctx context.Context, req *jvspb.ValidateJustificat
 		}, fmt.Errorf("failed to validate justification: %w", err)
 	}
 
+	// There is only one JQL and one issueKey, so the first match result is
+	// checked directly.
+	if len(result.Matches[0].MatchedIssues) == 1 {
+		issueID := strconv.Itoa(result.Matches[0].MatchedIssues[0])
+		return &jvspb.ValidateJustificationResponse{
+			Valid:   true,
+			Warning: result.Matches[0].Errors,
+			Annotation: map[string]string{
+				"jira_issue_id": issueID,
+			},
+		}, nil
+	}
+
 	return &jvspb.ValidateJustificationResponse{
-		// There is only one JQL and one issueKey, so the first match result is
-		// checked directly.
-		Valid:   len(result.Matches[0].MatchedIssues) == 1,
+		Valid:   false,
 		Warning: result.Matches[0].Errors,
 	}, nil
 }

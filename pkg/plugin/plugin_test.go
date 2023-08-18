@@ -68,6 +68,9 @@ func TestPlugin_Validate(t *testing.T) {
 			want: &jvspb.ValidateJustificationResponse{
 				Valid:   true,
 				Warning: []string{},
+				Annotation: map[string]string{
+					"jira_issue_id": "1234",
+				},
 			},
 		},
 		{
