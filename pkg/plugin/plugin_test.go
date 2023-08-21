@@ -69,7 +69,8 @@ func TestPlugin_Validate(t *testing.T) {
 				Valid:   true,
 				Warning: []string{},
 				Annotation: map[string]string{
-					"jira_issue_id": "1234",
+					"jira_issue_id":  "1234",
+					"jira_issue_url": "https://verily-okta-sandbox.atlassian.net/browse/ABCD",
 				},
 			},
 		},

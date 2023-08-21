@@ -89,11 +89,14 @@ func (j *JiraPlugin) Validate(ctx context.Context, req *jvspb.ValidateJustificat
 	// checked directly.
 	if len(result.Matches[0].MatchedIssues) == 1 {
 		issueID := strconv.Itoa(result.Matches[0].MatchedIssues[0])
+		baseURL := "https://verily-okta-sandbox.atlassian.net/browse/"
+		issueURL := baseURL + req.Justification.Value
 		return &jvspb.ValidateJustificationResponse{
 			Valid:   true,
 			Warning: result.Matches[0].Errors,
 			Annotation: map[string]string{
-				"jira_issue_id": issueID,
+				"jira_issue_id":  issueID,
+				"jira_issue_url": issueURL,
 			},
 		}, nil
 	}
