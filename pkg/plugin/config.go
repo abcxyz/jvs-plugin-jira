@@ -52,6 +52,9 @@ type PluginConfig struct {
 
 	// Hint is for what value to put as the justification.
 	Hint string
+
+	// BaseURL is used to construct a URL that can be clicked.
+	BaseURL string
 }
 
 // Validate checks if the config is valid.
@@ -76,6 +79,10 @@ func (cfg *PluginConfig) Validate() error {
 
 	if cfg.Hint == "" {
 		merr = errors.Join(merr, fmt.Errorf("empty JIRA_PLUGIN_HINT"))
+	}
+
+	if cfg.BaseURL == "" {
+		merr = errors.Join(merr, fmt.Errorf("empty JIRA_PLUGIN_BASE_URL"))
 	}
 
 	return merr
@@ -132,6 +139,14 @@ func (cfg *PluginConfig) ToFlags(set *cli.FlagSet) *cli.FlagSet {
 		EnvVar:  "JIRA_PLUGIN_HINT",
 		Example: "Jira Issue Key under specific project",
 		Usage:   "Hint is for what value to put as the justification.",
+	})
+
+	f.StringVar(&cli.StringVar{
+		Name:    "jira-plugin-base-url",
+		Target:  &cfg.BaseURL,
+		EnvVar:  "JIRA_PLUGIN_BASE_URL",
+		Example: "https://verily-okta-sandbox.atlassian.net/browse/",
+		Usage:   "The baseURL is used to construct a URL that can be clicked.",
 	})
 
 	return set

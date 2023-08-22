@@ -29,6 +29,12 @@ import (
 const (
 	// jiraCategory is the justification category this plugin will be validating.
 	jiraCategory = "jira"
+
+	// JiraIssueId is the key for the Jira Issue ID in the annotation map of the justification.
+	jiraIssueId = "jira_issue_id"
+
+	// jiraIssueURL is the key for the Jira Issue URL in the annotation map of the justification.
+	jiraIssueURL = "jira_issue_url"
 )
 
 // issueMatcher is the mockable interface for the convenience of testing.
@@ -40,6 +46,7 @@ type issueMatcher interface {
 type JiraPlugin struct {
 	validator issueMatcher
 	uiData    *jvspb.UIData
+	baseURL   string
 }
 
 // NewJiraPlugin creates a new JiraPlugin.
@@ -62,6 +69,7 @@ func NewJiraPlugin(ctx context.Context, cfg *PluginConfig) (*JiraPlugin, error) 
 	return &JiraPlugin{
 		validator: v,
 		uiData:    d,
+		baseURL:   cfg.BaseURL,
 	}, nil
 }
 
@@ -89,14 +97,13 @@ func (j *JiraPlugin) Validate(ctx context.Context, req *jvspb.ValidateJustificat
 	// checked directly.
 	if len(result.Matches[0].MatchedIssues) == 1 {
 		issueID := strconv.Itoa(result.Matches[0].MatchedIssues[0])
-		baseURL := "https://verily-okta-sandbox.atlassian.net/browse/"
-		issueURL := baseURL + req.Justification.Value
+		issueURL := j.baseURL + req.Justification.Value
 		return &jvspb.ValidateJustificationResponse{
 			Valid:   true,
 			Warning: result.Matches[0].Errors,
 			Annotation: map[string]string{
-				"jira_issue_id":  issueID,
-				"jira_issue_url": issueURL,
+				jiraIssueId:  issueID,
+				jiraIssueURL: issueURL,
 			},
 		}, nil
 	}

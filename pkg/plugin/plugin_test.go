@@ -124,19 +124,13 @@ func TestPlugin_Validate(t *testing.T) {
 				},
 			},
 			validator: &mockValidator{
-				result: &validator.MatchResult{
-					Matches: []*validator.Match{
-						{
-							MatchedIssues: []int{},
-							Errors:        []string{"not match"},
-						},
-					},
-				},
+				err: fmt.Errorf("non match"),
 			},
 			want: &jvspb.ValidateJustificationResponse{
-				Valid:   false,
-				Warning: []string{"not match"},
+				Valid: false,
+				Error: []string{"non match"},
 			},
+			wantErr: "failed to validate justification",
 		},
 		{
 			name: "match_error",
@@ -165,6 +159,7 @@ func TestPlugin_Validate(t *testing.T) {
 
 			p := &JiraPlugin{
 				validator: tc.validator,
+				baseURL:   "https://verily-okta-sandbox.atlassian.net/browse/",
 			}
 
 			ctx := logging.WithLogger(context.Background(), logging.TestLogger(t))
