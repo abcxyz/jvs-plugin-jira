@@ -31,7 +31,7 @@ const (
 	jiraCategory = "jira"
 
 	// JiraIssueId is the key for the Jira Issue ID in the annotation map of the justification.
-	jiraIssueId = "jira_issue_id"
+	jiraIssueID = "jira_issue_id"
 
 	// jiraIssueURL is the key for the Jira Issue URL in the annotation map of the justification.
 	jiraIssueURL = "jira_issue_url"
@@ -102,7 +102,7 @@ func (j *JiraPlugin) Validate(ctx context.Context, req *jvspb.ValidateJustificat
 			Valid:   true,
 			Warning: result.Matches[0].Errors,
 			Annotation: map[string]string{
-				jiraIssueId:  issueID,
+				jiraIssueID:  issueID,
 				jiraIssueURL: issueURL,
 			},
 		}, nil
