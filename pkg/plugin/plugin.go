@@ -31,7 +31,7 @@ const (
 	// jiraCategory is the justification category this plugin will be validating.
 	jiraCategory = "jira"
 
-	// JiraIssueId is the key for the Jira Issue ID in the annotation map of the justification.
+	// JiraIssueID is the key for the Jira Issue ID in the annotation map of the justification.
 	jiraIssueID = "jira_issue_id"
 
 	// jiraIssueURL is the key for the Jira Issue URL in the annotation map of the justification.

@@ -116,7 +116,6 @@ func (v *Validator) MatchIssue(ctx context.Context, issueKey string) (*MatchResu
 	if err != nil {
 		return nil, fmt.Errorf("failed to validate jira issue %q: %w", issueKey, err)
 	}
-
 	return result, nil
 }
 
