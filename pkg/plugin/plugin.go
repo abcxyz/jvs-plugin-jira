@@ -18,6 +18,7 @@ package plugin
 import (
 	"context"
 	"fmt"
+	"net/url"
 	"strconv"
 
 	secretmanager "cloud.google.com/go/secretmanager/apiv1"
@@ -44,9 +45,9 @@ type issueMatcher interface {
 
 // JiraPlugin is the implementation of jvspb.Validator interface.
 type JiraPlugin struct {
-	validator issueMatcher
-	uiData    *jvspb.UIData
-	baseURL   string
+	validator    issueMatcher
+	uiData       *jvspb.UIData
+	issueBaseURL string
 }
 
 // NewJiraPlugin creates a new JiraPlugin.
@@ -67,9 +68,9 @@ func NewJiraPlugin(ctx context.Context, cfg *PluginConfig) (*JiraPlugin, error) 
 	}
 
 	return &JiraPlugin{
-		validator: v,
-		uiData:    d,
-		baseURL:   cfg.BaseURL,
+		validator:    v,
+		uiData:       d,
+		issueBaseURL: cfg.IssueBaseURL,
 	}, nil
 }
 
@@ -93,11 +94,20 @@ func (j *JiraPlugin) Validate(ctx context.Context, req *jvspb.ValidateJustificat
 		}, fmt.Errorf("failed to validate justification: %w", err)
 	}
 
+	if len(result.Matches) == 0 || len(result.Matches[0].MatchedIssues) == 0 {
+		return nil, fmt.Errorf("failed to get the matched jira issue %q", req.Justification.Value)
+	}
+
 	// There is only one JQL and one issueKey, so the first match result is
 	// checked directly.
 	if len(result.Matches[0].MatchedIssues) == 1 {
 		issueID := strconv.Itoa(result.Matches[0].MatchedIssues[0])
-		issueURL := j.baseURL + req.Justification.Value
+
+		issueURL, err := url.JoinPath(j.issueBaseURL, "/browse/", req.Justification.Value)
+		if err != nil {
+			return nil, fmt.Errorf("failed to build a clickable url for issue %q", req.Justification.Value)
+		}
+
 		return &jvspb.ValidateJustificationResponse{
 			Valid:   true,
 			Warning: result.Matches[0].Errors,

@@ -61,8 +61,14 @@ func TestValidation(t *testing.T) {
 			matchHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				fmt.Fprintf(w, `{"matches":[{"matchedIssues":[],"errors":[]}]}`)
 			}),
-			want:    nil,
-			wantErr: `failed to find the matched jira issue "ABCD"`,
+			want: &MatchResult{
+				Matches: []*Match{
+					{
+						MatchedIssues: []int{},
+						Errors:        []string{},
+					},
+				},
+			},
 		},
 		{
 			name: "invalid_match_request",

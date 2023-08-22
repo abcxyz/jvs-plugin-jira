@@ -41,7 +41,7 @@ func TestPluginConfig_ToFlags(t *testing.T) {
 				"JIRA_PLUGIN_API_TOKEN_SECRET_ID": "projects/123456/secrets/api-token/versions/4",
 				"JIRA_PLUGIN_DISPLAY_NAME":        "Jira Issue Key",
 				"JIRA_PLUGIN_HINT":                "Jira Issue Key under JVS project",
-				"JIRA_PLUGIN_BASE_URL":            "https://verily-okta-sandbox.atlassian.net/browse/",
+				"JIRA_PLUGIN_ISSUE_BASE_URL":      "https://blahblah.atlassian.net",
 			},
 			wantConfig: &PluginConfig{
 				JIRAEndpoint:     "https://blahblah.atlassian.net/rest/api/3",
@@ -50,7 +50,7 @@ func TestPluginConfig_ToFlags(t *testing.T) {
 				APITokenSecretID: "projects/123456/secrets/api-token/versions/4",
 				DisplayName:      "Jira Issue Key",
 				Hint:             "Jira Issue Key under JVS project",
-				BaseURL:          "https://verily-okta-sandbox.atlassian.net/browse/",
+				IssueBaseURL:     "https://blahblah.atlassian.net",
 			},
 		},
 		{
@@ -63,7 +63,7 @@ func TestPluginConfig_ToFlags(t *testing.T) {
 				"projects/123456/secrets/api-token/versions/4",
 				"-jira-plugin-display-name", "Jira Issue Key",
 				"-jira-plugin-hint", "Jira Issue Key under specific project",
-				"-jira-plugin-base-url", "https://verily-okta-sandbox.atlassian.net/browse/",
+				"-jira-plugin-issue-base-url", "https://blahblah.atlassian.net",
 			},
 			wantConfig: &PluginConfig{
 				JIRAEndpoint:     "https://blahblah.atlassian.net/rest/api/3",
@@ -72,7 +72,7 @@ func TestPluginConfig_ToFlags(t *testing.T) {
 				APITokenSecretID: "projects/123456/secrets/api-token/versions/4",
 				DisplayName:      "Jira Issue Key",
 				Hint:             "Jira Issue Key under specific project",
-				BaseURL:          "https://verily-okta-sandbox.atlassian.net/browse/",
+				IssueBaseURL:     "https://blahblah.atlassian.net",
 			},
 		},
 		{
@@ -189,23 +189,23 @@ func TestPluginConfig_ToFlags(t *testing.T) {
 			},
 		},
 		{
-			name: "base_url_env",
+			name: "issue_base_url_env",
 			envs: map[string]string{
-				"JIRA_PLUGIN_BASE_URL": "https://verily-okta-sandbox.atlassian.net/browse/",
+				"JIRA_PLUGIN_ISSUE_BASE_URL": "https://blahblah.atlassian.net",
 			},
 			wantConfig: &PluginConfig{
-				DisplayName: "Jira Issue Key",
-				BaseURL:     "https://verily-okta-sandbox.atlassian.net/browse/",
+				DisplayName:  "Jira Issue Key",
+				IssueBaseURL: "https://blahblah.atlassian.net",
 			},
 		},
 		{
-			name: "base_url_flag",
+			name: "issue_base_url_flag",
 			args: []string{
-				"-jira-plugin-base-url", "https://verily-okta-sandbox.atlassian.net/browse/",
+				"-jira-plugin-issue-base-url", "https://blahblah.atlassian.net",
 			},
 			wantConfig: &PluginConfig{
-				DisplayName: "Jira Issue Key",
-				BaseURL:     "https://verily-okta-sandbox.atlassian.net/browse/",
+				DisplayName:  "Jira Issue Key",
+				IssueBaseURL: "https://blahblah.atlassian.net",
 			},
 		},
 	}
@@ -246,7 +246,7 @@ func TestPluginConfig_Validate(t *testing.T) {
 				APITokenSecretID: "projects/123456/secrets/api-token/versions/4",
 				DisplayName:      "Jira Issue Key",
 				Hint:             "Jira Issue Key under JVS project",
-				BaseURL:          "https://verily-okta-sandbox.atlassian.net/browse/",
+				IssueBaseURL:     "https://blahblah.atlassian.net",
 			},
 		},
 		{
@@ -257,7 +257,7 @@ func TestPluginConfig_Validate(t *testing.T) {
 				JIRAAccount:      "abc@xyz.com",
 				APITokenSecretID: "projects/123456/secrets/api-token/versions/4",
 				Hint:             "Jira Issue Key under JVS project",
-				BaseURL:          "https://verily-okta-sandbox.atlassian.net/browse/",
+				IssueBaseURL:     "https://blahblah.atlassian.net",
 			},
 		},
 		{
@@ -307,7 +307,7 @@ func TestPluginConfig_Validate(t *testing.T) {
 			wantErr: "empty JIRA_PLUGIN_HINT",
 		},
 		{
-			name: "empty_base_url",
+			name: "empty_issue_base_url",
 			cfg: &PluginConfig{
 				JIRAEndpoint:     "https://blahblah.atlassian.net/rest/api/3",
 				Jql:              "project = JRA and assignee != jsmith",
@@ -315,7 +315,7 @@ func TestPluginConfig_Validate(t *testing.T) {
 				APITokenSecretID: "projects/123456/secrets/api-token/versions/4",
 				Hint:             "Jira Issue Key under JVS project",
 			},
-			wantErr: "empty JIRA_PLUGIN_BASE_URL",
+			wantErr: "empty JIRA_PLUGIN_ISSUE_BASE_URL",
 		},
 	}
 

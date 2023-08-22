@@ -70,7 +70,7 @@ func TestPlugin_Validate(t *testing.T) {
 				Warning: []string{},
 				Annotation: map[string]string{
 					"jira_issue_id":  "1234",
-					"jira_issue_url": "https://verily-okta-sandbox.atlassian.net/browse/ABCD",
+					"jira_issue_url": "https://blahblah.atlassian.net/browse/ABCD",
 				},
 			},
 		},
@@ -94,6 +94,43 @@ func TestPlugin_Validate(t *testing.T) {
 			},
 			want:    nil,
 			wantErr: "failed to perform validation, expected category \"github\" to be \"jira\"",
+		},
+		{
+			name: "empty_matches",
+			req: &jvspb.ValidateJustificationRequest{
+				Justification: &jvspb.Justification{
+					Category: "jira",
+					Value:    "ABCD",
+				},
+			},
+			validator: &mockValidator{
+				result: &validator.MatchResult{
+					Matches: []*validator.Match{},
+				},
+			},
+			want:    nil,
+			wantErr: "failed to get the matched jira issue \"ABCD\"",
+		},
+		{
+			name: "empty_matchesIssue",
+			req: &jvspb.ValidateJustificationRequest{
+				Justification: &jvspb.Justification{
+					Category: "jira",
+					Value:    "ABCD",
+				},
+			},
+			validator: &mockValidator{
+				result: &validator.MatchResult{
+					Matches: []*validator.Match{
+						{
+							MatchedIssues: []int{},
+							Errors:        []string{},
+						},
+					},
+				},
+			},
+			want:    nil,
+			wantErr: "failed to get the matched jira issue \"ABCD\"",
 		},
 		{
 			name: "empty_value",
@@ -158,8 +195,8 @@ func TestPlugin_Validate(t *testing.T) {
 			t.Parallel()
 
 			p := &JiraPlugin{
-				validator: tc.validator,
-				baseURL:   "https://verily-okta-sandbox.atlassian.net/browse/",
+				validator:    tc.validator,
+				issueBaseURL: "https://blahblah.atlassian.net",
 			}
 
 			ctx := logging.WithLogger(context.Background(), logging.TestLogger(t))
