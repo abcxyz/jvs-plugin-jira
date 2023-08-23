@@ -103,8 +103,8 @@ func (j *JiraPlugin) Validate(ctx context.Context, req *jvspb.ValidateJustificat
 	if len(result.Matches[0].MatchedIssues) == 1 {
 		issueID := strconv.Itoa(result.Matches[0].MatchedIssues[0])
 
-		// The format for the Jira issue URL follows the pattern "thttps://<user’s subdomain>.atlassian.net/browse/<issueKey>".
-		issueURL, err := url.JoinPath(j.issueBaseURL, "/browse/", req.Justification.Value)
+		// The format for the Jira issue URL follows the pattern "https://your-domain.atlassian.net/browse/<issueKey>".
+		issueURL, err := url.JoinPath(j.issueBaseURL, "browse", req.Justification.Value)
 		if err != nil {
 			return nil, fmt.Errorf("failed to build a clickable url for issue %q", req.Justification.Value)
 		}
