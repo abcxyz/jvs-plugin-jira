@@ -68,6 +68,10 @@ func TestPlugin_Validate(t *testing.T) {
 			want: &jvspb.ValidateJustificationResponse{
 				Valid:   true,
 				Warning: []string{},
+				Annotation: map[string]string{
+					"jira_issue_id":  "1234",
+					"jira_issue_url": "https://example.atlassian.net/browse/ABCD",
+				},
 			},
 		},
 		{
@@ -90,6 +94,43 @@ func TestPlugin_Validate(t *testing.T) {
 			},
 			want:    nil,
 			wantErr: "failed to perform validation, expected category \"github\" to be \"jira\"",
+		},
+		{
+			name: "empty_matches",
+			req: &jvspb.ValidateJustificationRequest{
+				Justification: &jvspb.Justification{
+					Category: "jira",
+					Value:    "ABCD",
+				},
+			},
+			validator: &mockValidator{
+				result: &validator.MatchResult{
+					Matches: []*validator.Match{},
+				},
+			},
+			want:    nil,
+			wantErr: "failed to get the matched jira issue \"ABCD\"",
+		},
+		{
+			name: "empty_matchesIssue",
+			req: &jvspb.ValidateJustificationRequest{
+				Justification: &jvspb.Justification{
+					Category: "jira",
+					Value:    "ABCD",
+				},
+			},
+			validator: &mockValidator{
+				result: &validator.MatchResult{
+					Matches: []*validator.Match{
+						{
+							MatchedIssues: []int{},
+							Errors:        []string{},
+						},
+					},
+				},
+			},
+			want:    nil,
+			wantErr: "failed to get the matched jira issue \"ABCD\"",
 		},
 		{
 			name: "empty_value",
@@ -120,19 +161,13 @@ func TestPlugin_Validate(t *testing.T) {
 				},
 			},
 			validator: &mockValidator{
-				result: &validator.MatchResult{
-					Matches: []*validator.Match{
-						{
-							MatchedIssues: []int{},
-							Errors:        []string{"not match"},
-						},
-					},
-				},
+				err: fmt.Errorf("non match"),
 			},
 			want: &jvspb.ValidateJustificationResponse{
-				Valid:   false,
-				Warning: []string{"not match"},
+				Valid: false,
+				Error: []string{"non match"},
 			},
+			wantErr: "failed to validate justification",
 		},
 		{
 			name: "match_error",
@@ -160,7 +195,8 @@ func TestPlugin_Validate(t *testing.T) {
 			t.Parallel()
 
 			p := &JiraPlugin{
-				validator: tc.validator,
+				validator:    tc.validator,
+				issueBaseURL: "https://example.atlassian.net",
 			}
 
 			ctx := logging.WithLogger(context.Background(), logging.TestLogger(t))

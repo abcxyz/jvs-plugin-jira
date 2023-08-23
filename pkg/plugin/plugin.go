@@ -18,6 +18,8 @@ package plugin
 import (
 	"context"
 	"fmt"
+	"net/url"
+	"strconv"
 
 	secretmanager "cloud.google.com/go/secretmanager/apiv1"
 	"cloud.google.com/go/secretmanager/apiv1/secretmanagerpb"
@@ -28,6 +30,12 @@ import (
 const (
 	// jiraCategory is the justification category this plugin will be validating.
 	jiraCategory = "jira"
+
+	// JiraIssueID is the key for the Jira Issue ID in the annotation map of the justification.
+	jiraIssueID = "jira_issue_id"
+
+	// jiraIssueURL is the key for the Jira Issue URL in the annotation map of the justification.
+	jiraIssueURL = "jira_issue_url"
 )
 
 // issueMatcher is the mockable interface for the convenience of testing.
@@ -37,8 +45,9 @@ type issueMatcher interface {
 
 // JiraPlugin is the implementation of jvspb.Validator interface.
 type JiraPlugin struct {
-	validator issueMatcher
-	uiData    *jvspb.UIData
+	validator    issueMatcher
+	uiData       *jvspb.UIData
+	issueBaseURL string
 }
 
 // NewJiraPlugin creates a new JiraPlugin.
@@ -59,8 +68,9 @@ func NewJiraPlugin(ctx context.Context, cfg *PluginConfig) (*JiraPlugin, error) 
 	}
 
 	return &JiraPlugin{
-		validator: v,
-		uiData:    d,
+		validator:    v,
+		uiData:       d,
+		issueBaseURL: cfg.IssueBaseURL,
 	}, nil
 }
 
@@ -84,10 +94,33 @@ func (j *JiraPlugin) Validate(ctx context.Context, req *jvspb.ValidateJustificat
 		}, fmt.Errorf("failed to validate justification: %w", err)
 	}
 
+	if len(result.Matches) == 0 || len(result.Matches[0].MatchedIssues) == 0 {
+		return nil, fmt.Errorf("failed to get the matched jira issue %q", req.Justification.Value)
+	}
+
+	// There is only one JQL and one issueKey, so the first match result is
+	// checked directly.
+	if len(result.Matches[0].MatchedIssues) == 1 {
+		issueID := strconv.Itoa(result.Matches[0].MatchedIssues[0])
+
+		// The format for the Jira issue URL follows the pattern "https://your-domain.atlassian.net/browse/<issueKey>".
+		issueURL, err := url.JoinPath(j.issueBaseURL, "browse", req.Justification.Value)
+		if err != nil {
+			return nil, fmt.Errorf("failed to build a clickable url for issue %q", req.Justification.Value)
+		}
+
+		return &jvspb.ValidateJustificationResponse{
+			Valid:   true,
+			Warning: result.Matches[0].Errors,
+			Annotation: map[string]string{
+				jiraIssueID:  issueID,
+				jiraIssueURL: issueURL,
+			},
+		}, nil
+	}
+
 	return &jvspb.ValidateJustificationResponse{
-		// There is only one JQL and one issueKey, so the first match result is
-		// checked directly.
-		Valid:   len(result.Matches[0].MatchedIssues) == 1,
+		Valid:   false,
 		Warning: result.Matches[0].Errors,
 	}, nil
 }

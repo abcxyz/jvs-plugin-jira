@@ -35,57 +35,61 @@ func TestPluginConfig_ToFlags(t *testing.T) {
 		{
 			name: "all_envs_specified",
 			envs: map[string]string{
-				"JIRA_PLUGIN_ENDPOINT":            "https://blahblah.atlassian.net/rest/api/3",
+				"JIRA_PLUGIN_ENDPOINT":            "https://example.atlassian.net/rest/api/3",
 				"JIRA_PLUGIN_JQL":                 "project = JRA and assignee != jsmith",
 				"JIRA_PLUGIN_ACCOUNT":             "abc@xyz.com",
 				"JIRA_PLUGIN_API_TOKEN_SECRET_ID": "projects/123456/secrets/api-token/versions/4",
 				"JIRA_PLUGIN_DISPLAY_NAME":        "Jira Issue Key",
 				"JIRA_PLUGIN_HINT":                "Jira Issue Key under JVS project",
+				"JIRA_PLUGIN_ISSUE_BASE_URL":      "https://example.atlassian.net",
 			},
 			wantConfig: &PluginConfig{
-				JIRAEndpoint:     "https://blahblah.atlassian.net/rest/api/3",
+				JIRAEndpoint:     "https://example.atlassian.net/rest/api/3",
 				Jql:              "project = JRA and assignee != jsmith",
 				JIRAAccount:      "abc@xyz.com",
 				APITokenSecretID: "projects/123456/secrets/api-token/versions/4",
 				DisplayName:      "Jira Issue Key",
 				Hint:             "Jira Issue Key under JVS project",
+				IssueBaseURL:     "https://example.atlassian.net",
 			},
 		},
 		{
 			name: "all_flags_specified",
 			args: []string{
-				"-jira-plugin-endpoint", "https://blahblah.atlassian.net/rest/api/3",
+				"-jira-plugin-endpoint", "https://example.atlassian.net/rest/api/3",
 				"-jira-plugin-jql", "project = JRA and assignee != jsmith",
 				"-jira-plugin-account", "abc@xyz.com",
 				"-jira-plugin-api-token-secret-id",
 				"projects/123456/secrets/api-token/versions/4",
 				"-jira-plugin-display-name", "Jira Issue Key",
 				"-jira-plugin-hint", "Jira Issue Key under specific project",
+				"-jira-plugin-issue-base-url", "https://example.atlassian.net",
 			},
 			wantConfig: &PluginConfig{
-				JIRAEndpoint:     "https://blahblah.atlassian.net/rest/api/3",
+				JIRAEndpoint:     "https://example.atlassian.net/rest/api/3",
 				Jql:              "project = JRA and assignee != jsmith",
 				JIRAAccount:      "abc@xyz.com",
 				APITokenSecretID: "projects/123456/secrets/api-token/versions/4",
 				DisplayName:      "Jira Issue Key",
 				Hint:             "Jira Issue Key under specific project",
+				IssueBaseURL:     "https://example.atlassian.net",
 			},
 		},
 		{
 			name: "endpoint_env",
 			envs: map[string]string{
-				"JIRA_PLUGIN_ENDPOINT": "https://blahblah.atlassian.net/rest/api/3",
+				"JIRA_PLUGIN_ENDPOINT": "https://example.atlassian.net/rest/api/3",
 			},
 			wantConfig: &PluginConfig{
-				JIRAEndpoint: "https://blahblah.atlassian.net/rest/api/3",
+				JIRAEndpoint: "https://example.atlassian.net/rest/api/3",
 				DisplayName:  "Jira Issue Key",
 			},
 		},
 		{
 			name: "endpoint_flag",
-			args: []string{"-jira-plugin-endpoint", "https://blahblah.atlassian.net/rest/api/3"},
+			args: []string{"-jira-plugin-endpoint", "https://example.atlassian.net/rest/api/3"},
 			wantConfig: &PluginConfig{
-				JIRAEndpoint: "https://blahblah.atlassian.net/rest/api/3",
+				JIRAEndpoint: "https://example.atlassian.net/rest/api/3",
 				DisplayName:  "Jira Issue Key",
 			},
 		},
@@ -184,6 +188,26 @@ func TestPluginConfig_ToFlags(t *testing.T) {
 				Hint:        "jira hint",
 			},
 		},
+		{
+			name: "issue_base_url_env",
+			envs: map[string]string{
+				"JIRA_PLUGIN_ISSUE_BASE_URL": "https://example.atlassian.net",
+			},
+			wantConfig: &PluginConfig{
+				DisplayName:  "Jira Issue Key",
+				IssueBaseURL: "https://example.atlassian.net",
+			},
+		},
+		{
+			name: "issue_base_url_flag",
+			args: []string{
+				"-jira-plugin-issue-base-url", "https://example.atlassian.net",
+			},
+			wantConfig: &PluginConfig{
+				DisplayName:  "Jira Issue Key",
+				IssueBaseURL: "https://example.atlassian.net",
+			},
+		},
 	}
 
 	for _, tc := range cases {
@@ -216,22 +240,24 @@ func TestPluginConfig_Validate(t *testing.T) {
 		{
 			name: "valid",
 			cfg: &PluginConfig{
-				JIRAEndpoint:     "https://blahblah.atlassian.net/rest/api/3",
+				JIRAEndpoint:     "https://example.atlassian.net/rest/api/3",
 				Jql:              "project = JRA and assignee != jsmith",
 				JIRAAccount:      "abc@xyz.com",
 				APITokenSecretID: "projects/123456/secrets/api-token/versions/4",
 				DisplayName:      "Jira Issue Key",
 				Hint:             "Jira Issue Key under JVS project",
+				IssueBaseURL:     "https://example.atlassian.net",
 			},
 		},
 		{
 			name: "valid_without_display_name",
 			cfg: &PluginConfig{
-				JIRAEndpoint:     "https://blahblah.atlassian.net/rest/api/3",
+				JIRAEndpoint:     "https://example.atlassian.net/rest/api/3",
 				Jql:              "project = JRA and assignee != jsmith",
 				JIRAAccount:      "abc@xyz.com",
 				APITokenSecretID: "projects/123456/secrets/api-token/versions/4",
 				Hint:             "Jira Issue Key under JVS project",
+				IssueBaseURL:     "https://example.atlassian.net",
 			},
 		},
 		{
@@ -246,7 +272,7 @@ func TestPluginConfig_Validate(t *testing.T) {
 		{
 			name: "empty_jql",
 			cfg: &PluginConfig{
-				JIRAEndpoint:     "https://blahblah.atlassian.net/rest/api/3",
+				JIRAEndpoint:     "https://example.atlassian.net/rest/api/3",
 				JIRAAccount:      "abc@xyz.com",
 				APITokenSecretID: "projects/123456/secrets/api-token/versions/4",
 			},
@@ -255,7 +281,7 @@ func TestPluginConfig_Validate(t *testing.T) {
 		{
 			name: "empty_jira_account",
 			cfg: &PluginConfig{
-				JIRAEndpoint:     "https://blahblah.atlassian.net/rest/api/3",
+				JIRAEndpoint:     "https://example.atlassian.net/rest/api/3",
 				Jql:              "project = JRA and assignee != jsmith",
 				APITokenSecretID: "projects/123456/secrets/api-token/versions/4",
 			},
@@ -264,7 +290,7 @@ func TestPluginConfig_Validate(t *testing.T) {
 		{
 			name: "empty_api_token_secret_id",
 			cfg: &PluginConfig{
-				JIRAEndpoint: "https://blahblah.atlassian.net/rest/api/3",
+				JIRAEndpoint: "https://example.atlassian.net/rest/api/3",
 				Jql:          "project = JRA and assignee != jsmith",
 				JIRAAccount:  "abc@xyz.com",
 			},
@@ -273,12 +299,23 @@ func TestPluginConfig_Validate(t *testing.T) {
 		{
 			name: "empty_hint",
 			cfg: &PluginConfig{
-				JIRAEndpoint:     "https://blahblah.atlassian.net/rest/api/3",
+				JIRAEndpoint:     "https://example.atlassian.net/rest/api/3",
 				Jql:              "project = JRA and assignee != jsmith",
 				JIRAAccount:      "abc@xyz.com",
 				APITokenSecretID: "projects/123456/secrets/api-token/versions/4",
 			},
 			wantErr: "empty JIRA_PLUGIN_HINT",
+		},
+		{
+			name: "empty_issue_base_url",
+			cfg: &PluginConfig{
+				JIRAEndpoint:     "https://example.atlassian.net/rest/api/3",
+				Jql:              "project = JRA and assignee != jsmith",
+				JIRAAccount:      "abc@xyz.com",
+				APITokenSecretID: "projects/123456/secrets/api-token/versions/4",
+				Hint:             "Jira Issue Key under JVS project",
+			},
+			wantErr: "empty JIRA_PLUGIN_ISSUE_BASE_URL",
 		},
 	}
 

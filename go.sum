@@ -11,8 +11,8 @@ cloud.google.com/go/iam v1.1.2/go.mod h1:A5avdyVL2tCppe4unb0951eI9jreack+RJ0/d+K
 cloud.google.com/go/secretmanager v1.11.1 h1:cLTCwAjFh9fKvU6F13Y4L9vPcx9yiWPyWXE4+zkuEQs=
 cloud.google.com/go/secretmanager v1.11.1/go.mod h1:znq9JlXgTNdBeQk9TBW/FnR/W4uChEKGeqQWAJ8SXFw=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
-github.com/abcxyz/jvs v0.0.0-20230719002050-8d69b4678e7d h1:KCH8wdhrCjXgsPemHTEEmqHQVVpSejfu7s81jXRvCFE=
-github.com/abcxyz/jvs v0.0.0-20230719002050-8d69b4678e7d/go.mod h1:vGs/XYnkb5G6S2jO1DbnfT48hT8109XPlu5Sf6A9aJY=
+github.com/abcxyz/jvs v0.0.0-20230818204206-939b2b26b00a h1:y0nN1plYqmA8KjwoHXX8nkUJYJA0XZa0Z+CdEXeTnm8=
+github.com/abcxyz/jvs v0.0.0-20230818204206-939b2b26b00a/go.mod h1:RD8tBWfSC/ZP6497CHEOp/Psy29swXHm0w//1d7oWDM=
 github.com/abcxyz/pkg v0.7.1 h1:cH9VzzSLqjLI2OzxSaIutboq6Df8PB4N7zDvX9SOZfU=
 github.com/abcxyz/pkg v0.7.1/go.mod h1:ckJAhXvWQOFUIz85SGZvJa3REkfQviPKnqUNxZZ3qX0=
 github.com/antihax/optional v1.0.0/go.mod h1:uupD/76wgC+ih3iEmQUL+0Ugr19nfwCT1kdvxnR2qWY=
