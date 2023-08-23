@@ -70,7 +70,7 @@ func TestPlugin_Validate(t *testing.T) {
 				Warning: []string{},
 				Annotation: map[string]string{
 					"jira_issue_id":  "1234",
-					"jira_issue_url": "https://blahblah.atlassian.net/browse/ABCD",
+					"jira_issue_url": "https://example.atlassian.net/browse/ABCD",
 				},
 			},
 		},
@@ -196,7 +196,7 @@ func TestPlugin_Validate(t *testing.T) {
 
 			p := &JiraPlugin{
 				validator:    tc.validator,
-				issueBaseURL: "https://blahblah.atlassian.net",
+				issueBaseURL: "https://example.atlassian.net",
 			}
 
 			ctx := logging.WithLogger(context.Background(), logging.TestLogger(t))
