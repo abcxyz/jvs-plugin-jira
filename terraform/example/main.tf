@@ -37,13 +37,14 @@ module "jvs" {
   # Specify the plugin environment variables. See the file below for details:
   # https://github.com/abcxyz/jvs-plugin-jira/blob/main/pkg/plugin/config.go
   plugin_envvars = {
-    "JIRA_PLUGIN_ENDPOINT" : "https://blahblah.atlassian.net/rest/api/3",
+    "JIRA_PLUGIN_ENDPOINT" : "https://your-domain.atlassian.net/rest/api/3",
     "JIRA_PLUGIN_JQL" : "project = ABC and assignee != jsmith",
     "JIRA_PLUGIN_ACCOUNT" : "jvs-jira-bot@example.com",
     # Update to the correct version when the real API token is stored.
     "JIRA_PLUGIN_API_TOKEN_SECRET_ID" : module.jira_api_token.secret_version_name,
     "JIRA_PLUGIN_DISPLAY_NAME" : "Jira Issue Key",
     "JIRA_PLUGIN_HINT" : "Jira Issue Key under JVS project",
+    "JIRA_PLUGIN_ISSUE_BASE_URL" : "https://your-domain.atlassian.net",
   }
 }
 
