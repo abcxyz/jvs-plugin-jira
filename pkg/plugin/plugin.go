@@ -88,40 +88,44 @@ func (j *JiraPlugin) Validate(ctx context.Context, req *jvspb.ValidateJustificat
 
 	result, err := j.validator.MatchIssue(ctx, req.Justification.Value)
 	if err != nil {
-		return &jvspb.ValidateJustificationResponse{
-			Valid: false,
-			Error: []string{err.Error()},
-		}, fmt.Errorf("failed to validate justification: %w", err)
+		return nil, fmt.Errorf("failed to match justification %q with jira issue: %w", req.Justification.Value, err)
 	}
 
 	if len(result.Matches) == 0 || len(result.Matches[0].MatchedIssues) == 0 {
-		return nil, fmt.Errorf("failed to get the matched jira issue %q", req.Justification.Value)
-	}
-
-	// There is only one JQL and one issueKey, so the first match result is
-	// checked directly.
-	if len(result.Matches[0].MatchedIssues) == 1 {
-		issueID := strconv.Itoa(result.Matches[0].MatchedIssues[0])
-
-		// The format for the Jira issue URL follows the pattern "https://your-domain.atlassian.net/browse/<issueKey>".
-		issueURL, err := url.JoinPath(j.issueBaseURL, "browse", req.Justification.Value)
-		if err != nil {
-			return nil, fmt.Errorf("failed to build a clickable url for issue %q", req.Justification.Value)
-		}
-
 		return &jvspb.ValidateJustificationResponse{
-			Valid:   true,
-			Warning: result.Matches[0].Errors,
-			Annotation: map[string]string{
-				jiraIssueID:  issueID,
-				jiraIssueURL: issueURL,
-			},
+			Valid: false,
+			Warning: func() []string {
+				if len(result.Matches) == 0 {
+					return []string{}
+				}
+				return result.Matches[0].Errors
+			}(),
+			Error: []string{fmt.Sprintf("no matched jira issue for justification %q, ensure you input a valid and open jira issue", req.Justification.Value)},
 		}, nil
 	}
 
+	// There is only one JQL and one issueKey, only one matching result is expected.
+	if len(result.Matches[0].MatchedIssues) > 1 {
+		return &jvspb.ValidateJustificationResponse{
+			Valid:   false,
+			Warning: result.Matches[0].Errors,
+			Error:   []string{fmt.Sprintf("ambiguous justification %q, multiple matching jira issues are found: %v", req.Justification.Value, result.Matches[0].MatchedIssues)},
+		}, nil
+	}
+	issueID := strconv.Itoa(result.Matches[0].MatchedIssues[0])
+	// The format for the Jira issue URL follows the pattern "https://your-domain.atlassian.net/browse/<issueKey>".
+	issueURL, err := url.JoinPath(j.issueBaseURL, "browse", req.Justification.Value)
+	if err != nil {
+		return nil, fmt.Errorf("failed to build a clickable url for issue %q", req.Justification.Value)
+	}
+
 	return &jvspb.ValidateJustificationResponse{
-		Valid:   false,
+		Valid:   true,
 		Warning: result.Matches[0].Errors,
+		Annotation: map[string]string{
+			jiraIssueID:  issueID,
+			jiraIssueURL: issueURL,
+		},
 	}, nil
 }
 

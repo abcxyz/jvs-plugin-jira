@@ -108,8 +108,11 @@ func TestPlugin_Validate(t *testing.T) {
 					Matches: []*validator.Match{},
 				},
 			},
-			want:    nil,
-			wantErr: "failed to get the matched jira issue \"ABCD\"",
+			want: &jvspb.ValidateJustificationResponse{
+				Valid:   false,
+				Warning: []string{},
+				Error:   []string{"no matched jira issue for justification \"ABCD\", ensure you input a valid and open jira issue"},
+			},
 		},
 		{
 			name: "empty_matchesIssue",
@@ -129,8 +132,11 @@ func TestPlugin_Validate(t *testing.T) {
 					},
 				},
 			},
-			want:    nil,
-			wantErr: "failed to get the matched jira issue \"ABCD\"",
+			want: &jvspb.ValidateJustificationResponse{
+				Valid:   false,
+				Warning: []string{},
+				Error:   []string{"no matched jira issue for justification \"ABCD\", ensure you input a valid and open jira issue"},
+			},
 		},
 		{
 			name: "empty_value",
@@ -163,11 +169,8 @@ func TestPlugin_Validate(t *testing.T) {
 			validator: &mockValidator{
 				err: fmt.Errorf("non match"),
 			},
-			want: &jvspb.ValidateJustificationResponse{
-				Valid: false,
-				Error: []string{"non match"},
-			},
-			wantErr: "failed to validate justification",
+			want:    nil,
+			wantErr: "failed to match justification \"ABCD\" with jira issue: non match",
 		},
 		{
 			name: "match_error",
@@ -180,11 +183,32 @@ func TestPlugin_Validate(t *testing.T) {
 			validator: &mockValidator{
 				err: fmt.Errorf("failed match"),
 			},
-			want: &jvspb.ValidateJustificationResponse{
-				Valid: false,
-				Error: []string{"failed match"},
+			want:    nil,
+			wantErr: "failed to match justification \"ABCD\" with jira issue: failed match",
+		},
+		{
+			name: "multiple_matches",
+			req: &jvspb.ValidateJustificationRequest{
+				Justification: &jvspb.Justification{
+					Category: "jira",
+					Value:    "ABCD",
+				},
 			},
-			wantErr: "failed to validate justification",
+			validator: &mockValidator{
+				result: &validator.MatchResult{
+					Matches: []*validator.Match{
+						{
+							MatchedIssues: []int{1234, 5678, 6784},
+							Errors:        []string{},
+						},
+					},
+				},
+			},
+			want: &jvspb.ValidateJustificationResponse{
+				Valid:   false,
+				Warning: []string{},
+				Error:   []string{"ambiguous justification \"ABCD\", multiple matching jira issues are found: [1234 5678 6784]"},
+			},
 		},
 	}
 
