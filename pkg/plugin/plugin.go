@@ -125,7 +125,6 @@ func (j *JiraPlugin) Validate(ctx context.Context, req *jvspb.ValidateJustificat
 
 // Validate returns the validation result.
 func (j *JiraPlugin) validateWithJiraEndpoint(ctx context.Context, justificationValue string) (*validator.Match, error) {
-
 	result, err := j.validator.MatchIssue(ctx, justificationValue)
 	if err != nil {
 		return nil, fmt.Errorf("failed to match justification %q with jira issue: %w", justificationValue, err)
