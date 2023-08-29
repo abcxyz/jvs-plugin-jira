@@ -17,7 +17,9 @@ package plugin
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"log"
 	"net/url"
 	"strconv"
 
@@ -25,6 +27,11 @@ import (
 	"cloud.google.com/go/secretmanager/apiv1/secretmanagerpb"
 	"github.com/abcxyz/jvs-plugin-jira/pkg/validator"
 	jvspb "github.com/abcxyz/jvs/apis/v0"
+	"github.com/abcxyz/pkg/logging"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
+	validationError "github.com/abcxyz/jvs-plugin-jira/pkg/errors"
 )
 
 const (
@@ -76,57 +83,67 @@ func NewJiraPlugin(ctx context.Context, cfg *PluginConfig) (*JiraPlugin, error) 
 
 // Validate returns the validation result.
 func (j *JiraPlugin) Validate(ctx context.Context, req *jvspb.ValidateJustificationRequest) (*jvspb.ValidateJustificationResponse, error) {
+	logger := logging.FromContext(ctx)
 	if got, want := req.Justification.Category, jiraCategory; got != want {
-		return nil,
-			fmt.Errorf("failed to perform validation, expected category %q to be %q",
-				got, want)
+		err := fmt.Errorf("failed to perform validation, expected category %q to be %q", got, want)
+		logger.ErrorContext(ctx, "failed to validate jira justification", "error", err)
+		return standardValidationErrResponse(err.Error()), nil
 	}
 
 	if req.Justification.Value == "" {
-		return nil, fmt.Errorf("empty justification value")
+		err := errors.New("empty justification value")
+		logger.ErrorContext(ctx, "failed to validate jira justification", "error", err)
+		return standardValidationErrResponse(err.Error()), nil
 	}
 
-	result, err := j.validator.MatchIssue(ctx, req.Justification.Value)
+	result, err := j.validateWithJiraEndpoint(ctx, req.Justification.Value)
 	if err != nil {
-		return nil, fmt.Errorf("failed to match justification %q with jira issue: %w", req.Justification.Value, err)
+		logger.ErrorContext(ctx, "failed to validate with jira endpoint", "error", err)
+		log.Printf("failed to validate with jira endpoint %v", err)
+		if errors.Is(err, validationError.ErrInvalidJustification) {
+			return standardValidationErrResponse(
+					fmt.Sprintf("invalid jira justification %q, ensure you input a valid jira id for an open issue", req.Justification.Value)),
+				nil
+		} else {
+			return nil, standardInternalErr(req.Justification.Value)
+		}
 	}
-
-	if len(result.Matches) == 0 || len(result.Matches[0].MatchedIssues) == 0 {
-		return &jvspb.ValidateJustificationResponse{
-			Valid: false,
-			Warning: func() []string {
-				if len(result.Matches) == 0 {
-					return []string{}
-				}
-				return result.Matches[0].Errors
-			}(),
-			Error: []string{fmt.Sprintf("no matched jira issue for justification %q, ensure you input a valid and open jira issue", req.Justification.Value)},
-		}, nil
-	}
-
-	// There is only one JQL and one issueKey, only one matching result is expected.
-	if len(result.Matches[0].MatchedIssues) > 1 {
-		return &jvspb.ValidateJustificationResponse{
-			Valid:   false,
-			Warning: result.Matches[0].Errors,
-			Error:   []string{fmt.Sprintf("ambiguous justification %q, multiple matching jira issues are found: %v", req.Justification.Value, result.Matches[0].MatchedIssues)},
-		}, nil
-	}
-	issueID := strconv.Itoa(result.Matches[0].MatchedIssues[0])
+	issueID := strconv.Itoa(result.MatchedIssues[0])
 	// The format for the Jira issue URL follows the pattern "https://your-domain.atlassian.net/browse/<issueKey>".
 	issueURL, err := url.JoinPath(j.issueBaseURL, "browse", req.Justification.Value)
 	if err != nil {
-		return nil, fmt.Errorf("failed to build a clickable url for issue %q", req.Justification.Value)
+		logger.ErrorContext(ctx, "failed to build a clickable url for issue", "error", err)
+		return nil, standardInternalErr(req.Justification.Value)
 	}
 
 	return &jvspb.ValidateJustificationResponse{
 		Valid:   true,
-		Warning: result.Matches[0].Errors,
+		Warning: result.Errors,
 		Annotation: map[string]string{
 			jiraIssueID:  issueID,
 			jiraIssueURL: issueURL,
 		},
 	}, nil
+}
+
+// Validate returns the validation result.
+func (j *JiraPlugin) validateWithJiraEndpoint(ctx context.Context, justificationValue string) (*validator.Match, error) {
+
+	result, err := j.validator.MatchIssue(ctx, justificationValue)
+	if err != nil {
+		return nil, fmt.Errorf("failed to match justification %q with jira issue: %w", justificationValue, err)
+	}
+
+	if len(result.Matches) == 0 || len(result.Matches[0].MatchedIssues) == 0 {
+		return nil, fmt.Errorf("no matched jira issue for justification %q: %w", justificationValue, validationError.ErrInvalidJustification)
+	}
+
+	// There is only one JQL and one issueKey, only one matching result is expected.
+	if len(result.Matches[0].MatchedIssues) > 1 {
+		return nil, fmt.Errorf("ambiguous justification %q, multiple matching jira issues are found %v: %w", justificationValue, result.Matches[0].MatchedIssues, validationError.ErrInvalidJustification)
+	}
+
+	return result.Matches[0], nil
 }
 
 func (j *JiraPlugin) GetUIData(ctx context.Context, req *jvspb.GetUIDataRequest) (*jvspb.UIData, error) {
@@ -150,4 +167,15 @@ func secretVersion(ctx context.Context, secretVersionName string) (string, error
 	}
 
 	return string(resp.GetPayload().GetData()), nil
+}
+
+func standardInternalErr(justificationValue string) error {
+	return status.Errorf(codes.Internal, "failed to validate jira issue %q", justificationValue)
+}
+
+func standardValidationErrResponse(errStr string) *jvspb.ValidateJustificationResponse {
+	return &jvspb.ValidateJustificationResponse{
+		Valid: false,
+		Error: []string{errStr},
+	}
 }

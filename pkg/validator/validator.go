@@ -20,12 +20,15 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"net/url"
 	"path"
 	"time"
+
+	validationError "github.com/abcxyz/jvs-plugin-jira/pkg/errors"
 )
 
 const (
@@ -136,7 +139,7 @@ func (v *Validator) jiraIssue(ctx context.Context, issueIDOrKey string) (*jiraIs
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil {
-		return nil, fmt.Errorf("failed to construct request: %w", err)
+		return nil, fmt.Errorf("failed to construct jira issue request: %w", errors.Join(validationError.ErrInternal, err))
 	}
 
 	req.Header.Set("Accept", "application/json")
@@ -167,12 +170,12 @@ func (v *Validator) matchJQL(ctx context.Context, issue *jiraIssue) (*MatchResul
 	}
 	body, err := json.Marshal(data)
 	if err != nil {
-		return nil, fmt.Errorf("failed to construct request body: %w", err)
+		return nil, fmt.Errorf("failed to construct request body: %w", errors.Join(validationError.ErrInternal, err))
 	}
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewBuffer(body))
 	if err != nil {
-		return nil, fmt.Errorf("failed to construct request: %w", err)
+		return nil, fmt.Errorf("failed to construct request: %w", errors.Join(validationError.ErrInternal, err))
 	}
 
 	req.Header.Set("Accept", "application/json")
@@ -197,15 +200,21 @@ func (v *Validator) makeRequest(req *http.Request, respVal any) error {
 	}
 	defer resp.Body.Close()
 
-	if got, want := resp.StatusCode, http.StatusOK; got != want {
+	if resp.StatusCode >= http.StatusInternalServerError {
+		// Return ErrInternal if jira api returns http status code 5xx.
 		return fmt.Errorf(
-			"failed to make request to %s, expected response code %d to be %d",
-			req.URL.String(), got, want)
+			"failed to make request to %s, got response code %d: %w",
+			req.URL.String(), resp.StatusCode, errors.Join(validationError.ErrInternal, err))
+	} else if resp.StatusCode >= http.StatusBadRequest {
+		// Return ErrInvalidJustification if jira api returns http status code 4xx.
+		return fmt.Errorf(
+			"failed to make request to %s, got response code %d: %w",
+			req.URL.String(), resp.StatusCode, errors.Join(validationError.ErrInvalidJustification, err))
 	}
 
 	r := io.LimitReader(resp.Body, jiraResponseSizeLimitBytes)
 	if err := json.NewDecoder(r).Decode(&respVal); err != nil {
-		return fmt.Errorf("failed to decode response: %w", err)
+		return fmt.Errorf("failed to decode response: %w", errors.Join(validationError.ErrInternal, err))
 	}
 
 	return nil

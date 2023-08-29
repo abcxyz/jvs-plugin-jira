@@ -80,7 +80,7 @@ func TestValidation(t *testing.T) {
 				fmt.Fprintf(w, `{"errorMessages":["There was an error parsing JSON. Check that your request body is valid."]}`)
 			}),
 			want:    nil,
-			wantErr: "jql/match, expected response code 400 to be 200",
+			wantErr: "/jql/match, got response code 400: invalid justification",
 		},
 		{
 			name: "issue_does_not_exist",
@@ -92,7 +92,31 @@ func TestValidation(t *testing.T) {
 				fmt.Fprintf(w, `{"matches":[{"matchedIssues":[1234],"errors":[]}]}`)
 			}),
 			want:    nil,
-			wantErr: "issue/ABCD?fields=key%2Cid, expected response code 404 to be 200",
+			wantErr: "issue/ABCD?fields=key%2Cid, got response code 404: invalid justification",
+		},
+		{
+			name: "jira_issue_return_500",
+			issuesHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(http.StatusInternalServerError)
+				fmt.Fprintf(w, `{"errorMessages":[""],"errors":{}}`)
+			}),
+			matchHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				fmt.Fprintf(w, `{"matches":[{"matchedIssues":[1234],"errors":[]}]}`)
+			}),
+			want:    nil,
+			wantErr: "issue/ABCD?fields=key%2Cid, got response code 500: internal error, unable to perform jira validation",
+		},
+		{
+			name: "jira_match_return_500",
+			issuesHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				fmt.Fprint(w, `{"id":"1234","self":"https://test.atlassian.net/rest/api/3/issue/1234","key":"ABCD"}`)
+			}),
+			matchHandler: http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(http.StatusInternalServerError)
+				fmt.Fprintf(w, `{"matches":[{"matchedIssues":,"errors":[]}]}`)
+			}),
+			want:    nil,
+			wantErr: "/jql/match, got response code 500: internal error, unable to perform jira validation",
 		},
 	}
 

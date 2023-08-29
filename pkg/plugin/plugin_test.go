@@ -26,6 +26,8 @@ import (
 	"github.com/abcxyz/pkg/testutil"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
+
+	validationError "github.com/abcxyz/jvs-plugin-jira/pkg/errors"
 )
 
 type mockValidator struct {
@@ -92,8 +94,7 @@ func TestPlugin_Validate(t *testing.T) {
 					},
 				},
 			},
-			want:    nil,
-			wantErr: "failed to perform validation, expected category \"github\" to be \"jira\"",
+			want: standardValidationErrResponse("failed to perform validation, expected category \"github\" to be \"jira\""),
 		},
 		{
 			name: "empty_matches",
@@ -108,11 +109,7 @@ func TestPlugin_Validate(t *testing.T) {
 					Matches: []*validator.Match{},
 				},
 			},
-			want: &jvspb.ValidateJustificationResponse{
-				Valid:   false,
-				Warning: []string{},
-				Error:   []string{"no matched jira issue for justification \"ABCD\", ensure you input a valid and open jira issue"},
-			},
+			want: standardValidationErrResponse("invalid jira justification \"ABCD\", ensure you input a valid jira id for an open issue"),
 		},
 		{
 			name: "empty_matchesIssue",
@@ -132,11 +129,7 @@ func TestPlugin_Validate(t *testing.T) {
 					},
 				},
 			},
-			want: &jvspb.ValidateJustificationResponse{
-				Valid:   false,
-				Warning: []string{},
-				Error:   []string{"no matched jira issue for justification \"ABCD\", ensure you input a valid and open jira issue"},
-			},
+			want: standardValidationErrResponse("invalid jira justification \"ABCD\", ensure you input a valid jira id for an open issue"),
 		},
 		{
 			name: "empty_value",
@@ -155,8 +148,7 @@ func TestPlugin_Validate(t *testing.T) {
 					},
 				},
 			},
-			want:    nil,
-			wantErr: "empty justification value",
+			want: standardValidationErrResponse("empty justification value"),
 		},
 		{
 			name: "not_match_jql",
@@ -167,10 +159,9 @@ func TestPlugin_Validate(t *testing.T) {
 				},
 			},
 			validator: &mockValidator{
-				err: fmt.Errorf("non match"),
+				err: fmt.Errorf("non match: %w", validationError.ErrInvalidJustification),
 			},
-			want:    nil,
-			wantErr: "failed to match justification \"ABCD\" with jira issue: non match",
+			want: standardValidationErrResponse("invalid jira justification \"ABCD\", ensure you input a valid jira id for an open issue"),
 		},
 		{
 			name: "match_error",
@@ -181,10 +172,10 @@ func TestPlugin_Validate(t *testing.T) {
 				},
 			},
 			validator: &mockValidator{
-				err: fmt.Errorf("failed match"),
+				err: fmt.Errorf("non match: %w", validationError.ErrInternal),
 			},
 			want:    nil,
-			wantErr: "failed to match justification \"ABCD\" with jira issue: failed match",
+			wantErr: standardInternalErr("ABCD").Error(),
 		},
 		{
 			name: "multiple_matches",
@@ -204,11 +195,7 @@ func TestPlugin_Validate(t *testing.T) {
 					},
 				},
 			},
-			want: &jvspb.ValidateJustificationResponse{
-				Valid:   false,
-				Warning: []string{},
-				Error:   []string{"ambiguous justification \"ABCD\", multiple matching jira issues are found: [1234 5678 6784]"},
-			},
+			want: standardValidationErrResponse("invalid jira justification \"ABCD\", ensure you input a valid jira id for an open issue"),
 		},
 	}
 
