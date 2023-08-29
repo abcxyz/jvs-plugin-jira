@@ -27,7 +27,6 @@ import (
 	"cloud.google.com/go/secretmanager/apiv1/secretmanagerpb"
 	"github.com/abcxyz/jvs-plugin-jira/pkg/validator"
 	jvspb "github.com/abcxyz/jvs/apis/v0"
-	"github.com/abcxyz/pkg/logging"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -83,23 +82,21 @@ func NewJiraPlugin(ctx context.Context, cfg *PluginConfig) (*JiraPlugin, error) 
 
 // Validate returns the validation result.
 func (j *JiraPlugin) Validate(ctx context.Context, req *jvspb.ValidateJustificationRequest) (*jvspb.ValidateJustificationResponse, error) {
-	logger := logging.FromContext(ctx)
 	if got, want := req.Justification.Category, jiraCategory; got != want {
 		err := fmt.Errorf("failed to perform validation, expected category %q to be %q", got, want)
-		logger.ErrorContext(ctx, "failed to validate jira justification", "error", err)
+		log.Printf("failed to validate jira justification: %v", err)
 		return standardValidationErrResponse(err.Error()), nil
 	}
 
 	if req.Justification.Value == "" {
 		err := errors.New("empty justification value")
-		logger.ErrorContext(ctx, "failed to validate jira justification", "error", err)
+		log.Printf("failed to validate jira justification: %v", err)
 		return standardValidationErrResponse(err.Error()), nil
 	}
 
 	result, err := j.validateWithJiraEndpoint(ctx, req.Justification.Value)
 	if err != nil {
-		logger.ErrorContext(ctx, "failed to validate with jira endpoint", "error", err)
-		log.Printf("failed to validate with jira endpoint %v", err)
+		log.Printf("failed to validate with jira endpoint: %v", err)
 		if errors.Is(err, validationError.ErrInvalidJustification) {
 			return standardValidationErrResponse(
 					fmt.Sprintf("invalid jira justification %q, ensure you input a valid jira id for an open issue", req.Justification.Value)),
@@ -112,7 +109,7 @@ func (j *JiraPlugin) Validate(ctx context.Context, req *jvspb.ValidateJustificat
 	// The format for the Jira issue URL follows the pattern "https://your-domain.atlassian.net/browse/<issueKey>".
 	issueURL, err := url.JoinPath(j.issueBaseURL, "browse", req.Justification.Value)
 	if err != nil {
-		logger.ErrorContext(ctx, "failed to build a clickable url for issue", "error", err)
+		log.Printf("failed to build a clickable url for issue: %v", err)
 		return nil, standardInternalErr(req.Justification.Value)
 	}
 
@@ -170,7 +167,7 @@ func secretVersion(ctx context.Context, secretVersionName string) (string, error
 }
 
 func standardInternalErr(justificationValue string) error {
-	return status.Errorf(codes.Internal, "failed to validate jira issue %q", justificationValue)
+	return status.Errorf(codes.Internal, "internal error, unable to validate jira issue %q", justificationValue)
 }
 
 func standardValidationErrResponse(errStr string) *jvspb.ValidateJustificationResponse {

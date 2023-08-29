@@ -196,7 +196,7 @@ func (v *Validator) makeRequest(req *http.Request, respVal any) error {
 
 	resp, err := v.httpClient.Do(req)
 	if err != nil {
-		return fmt.Errorf("failed to make request: %w", err)
+		return fmt.Errorf("failed to make request: %w", errors.Join(validationError.ErrInternal, err))
 	}
 	defer resp.Body.Close()
 
