@@ -1,5 +1,3 @@
-package errors
-
 // Copyright 2023 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,6 +12,8 @@ package errors
 // See the License for the specific language governing permissions and
 // limitations under the License.
 // Error is a concrete error implementation.
+
+package errors
 
 type Error string
 
