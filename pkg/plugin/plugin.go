@@ -169,7 +169,7 @@ func standardInternalErr(justificationValue string) error {
 	return status.Errorf(codes.Internal, "internal error, unable to validate jira issue %q", justificationValue)
 }
 
-func standardValidationErrResponse(errStr string) *jvspb.ValidateJustificationResponse {
+func invalidErrResponse(err error) *jvspb.ValidateJustificationResponse {
 	return &jvspb.ValidateJustificationResponse{
 		Valid: false,
 		Error: []string{errStr},
