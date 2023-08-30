@@ -165,8 +165,8 @@ func secretVersion(ctx context.Context, secretVersionName string) (string, error
 	return string(resp.GetPayload().GetData()), nil
 }
 
-func standardInternalErr(justificationValue string) error {
-	return status.Errorf(codes.Internal, "internal error, unable to validate jira issue %q", justificationValue)
+func internalErr(justificationValue string) error {
+	return status.Errorf(codes.Internal, "unable to validate jira issue %q", justificationValue)
 }
 
 func invalidErrResponse(err error) *jvspb.ValidateJustificationResponse {
