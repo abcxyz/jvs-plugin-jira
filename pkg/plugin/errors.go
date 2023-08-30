@@ -13,8 +13,10 @@
 // limitations under the License.
 
 // Error is a concrete error implementation.
-package errors
+package plugin
+
+import "fmt"
 
 var (
-	ErrInvalidJustification = fmt.Errorf("invalid justification")
+	errInvalidJustification = fmt.Errorf("invalid justification")
 )

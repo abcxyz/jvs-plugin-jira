@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package validator
+package plugin
 
 import (
 	"context"
@@ -104,7 +104,7 @@ func TestValidation(t *testing.T) {
 				fmt.Fprintf(w, `{"matches":[{"matchedIssues":[1234],"errors":[]}]}`)
 			}),
 			want:    nil,
-			wantErr: "issue/ABCD?fields=key%2Cid, got response code 500: internal error, unable to perform jira validation",
+			wantErr: "issue/ABCD?fields=key%2Cid, got response code 500",
 		},
 		{
 			name: "jira_match_return_500",
@@ -116,7 +116,7 @@ func TestValidation(t *testing.T) {
 				fmt.Fprintf(w, `{"matches":[{"matchedIssues":,"errors":[]}]}`)
 			}),
 			want:    nil,
-			wantErr: "/jql/match, got response code 500: internal error, unable to perform jira validation",
+			wantErr: "/jql/match, got response code 500",
 		},
 	}
 

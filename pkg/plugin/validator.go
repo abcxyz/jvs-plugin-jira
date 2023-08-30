@@ -14,7 +14,7 @@
 
 // Package validator provides functions to validate jira issue against
 // validation criteria.
-package validator
+package plugin
 
 import (
 	"bytes"
@@ -27,8 +27,6 @@ import (
 	"net/url"
 	"path"
 	"time"
-
-	validationError "github.com/abcxyz/jvs-plugin-jira/pkg/errors"
 )
 
 const (
@@ -93,7 +91,7 @@ type MatchResult struct {
 	Matches []*Match `json:"matches"`
 }
 
-// NewValidator creates a new validator.
+// NewValidator creates a new
 func NewValidator(baseURL, jql, account, apiToken string) (*Validator, error) {
 	u, err := url.Parse(baseURL)
 	if err != nil {
@@ -139,7 +137,7 @@ func (v *Validator) jiraIssue(ctx context.Context, issueIDOrKey string) (*jiraIs
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil {
-		return nil, fmt.Errorf("failed to construct jira issue request: %w", errors.Join(validationError.ErrInternal, err))
+		return nil, fmt.Errorf("failed to construct jira issue request: %w", err)
 	}
 
 	req.Header.Set("Accept", "application/json")
@@ -170,12 +168,12 @@ func (v *Validator) matchJQL(ctx context.Context, issue *jiraIssue) (*MatchResul
 	}
 	body, err := json.Marshal(data)
 	if err != nil {
-		return nil, fmt.Errorf("failed to construct request body: %w", errors.Join(validationError.ErrInternal, err))
+		return nil, fmt.Errorf("failed to construct request body: %w", err)
 	}
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, u.String(), bytes.NewBuffer(body))
 	if err != nil {
-		return nil, fmt.Errorf("failed to construct request: %w", errors.Join(validationError.ErrInternal, err))
+		return nil, fmt.Errorf("failed to construct request: %w", err)
 	}
 
 	req.Header.Set("Accept", "application/json")
@@ -196,7 +194,7 @@ func (v *Validator) makeRequest(req *http.Request, respVal any) error {
 
 	resp, err := v.httpClient.Do(req)
 	if err != nil {
-		return fmt.Errorf("failed to make request: %w", errors.Join(validationError.ErrInternal, err))
+		return fmt.Errorf("failed to make request: %w", err)
 	}
 	defer resp.Body.Close()
 
@@ -204,17 +202,17 @@ func (v *Validator) makeRequest(req *http.Request, respVal any) error {
 		// Return ErrInternal if jira api returns http status code 5xx.
 		return fmt.Errorf(
 			"failed to make request to %s, got response code %d: %w",
-			req.URL.String(), resp.StatusCode, errors.Join(validationError.ErrInternal, err))
+			req.URL.String(), resp.StatusCode, err)
 	} else if resp.StatusCode >= http.StatusBadRequest {
-		// Return ErrInvalidJustification if jira api returns http status code 4xx.
+		// Return errInvalidJustification if jira api returns http status code 4xx.
 		return fmt.Errorf(
 			"failed to make request to %s, got response code %d: %w",
-			req.URL.String(), resp.StatusCode, errors.Join(validationError.ErrInvalidJustification, err))
+			req.URL.String(), resp.StatusCode, errors.Join(errInvalidJustification, err))
 	}
 
 	r := io.LimitReader(resp.Body, jiraResponseSizeLimitBytes)
 	if err := json.NewDecoder(r).Decode(&respVal); err != nil {
-		return fmt.Errorf("failed to decode response: %w", errors.Join(validationError.ErrInternal, err))
+		return fmt.Errorf("failed to decode response: %w", err)
 	}
 
 	return nil
