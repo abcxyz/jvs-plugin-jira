@@ -19,7 +19,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
 	"net/url"
 	"strconv"
 
@@ -81,19 +80,19 @@ func NewJiraPlugin(ctx context.Context, cfg *PluginConfig) (*JiraPlugin, error) 
 func (j *JiraPlugin) Validate(ctx context.Context, req *jvspb.ValidateJustificationRequest) (*jvspb.ValidateJustificationResponse, error) {
 	if got, want := req.Justification.Category, jiraCategory; got != want {
 		err := fmt.Errorf("failed to perform validation, expected category %q to be %q", got, want)
-		log.Printf("failed to validate jira justification: %v", err)
+		// TODO(https://github.com/abcxyz/jvs-plugin-jira/issues/48): log error details.
 		return invalidErrResponse(err.Error()), nil
 	}
 
 	if req.Justification.Value == "" {
 		err := errors.New("empty justification value")
-		log.Printf("failed to validate jira justification: %v", err)
+		// TODO(https://github.com/abcxyz/jvs-plugin-jira/issues/48): log error details.
 		return invalidErrResponse(err.Error()), nil
 	}
 
 	result, err := j.validateWithJiraEndpoint(ctx, req.Justification.Value)
 	if err != nil {
-		log.Printf("failed to validate with jira endpoint: %v", err)
+		// TODO(https://github.com/abcxyz/jvs-plugin-jira/issues/48): log error details.
 		if errors.Is(err, errInvalidJustification) {
 			return invalidErrResponse(
 					fmt.Sprintf("invalid jira justification %q, ensure you input a valid jira id for an open issue", req.Justification.Value)),
@@ -106,7 +105,7 @@ func (j *JiraPlugin) Validate(ctx context.Context, req *jvspb.ValidateJustificat
 	// The format for the Jira issue URL follows the pattern "https://your-domain.atlassian.net/browse/<issueKey>".
 	issueURL, err := url.JoinPath(j.issueBaseURL, "browse", req.Justification.Value)
 	if err != nil {
-		log.Printf("failed to build a clickable url for issue: %v", err)
+		// TODO(https://github.com/abcxyz/jvs-plugin-jira/issues/48): log error details.
 		return nil, internalErr(req.Justification.Value)
 	}
 
