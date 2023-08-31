@@ -20,7 +20,6 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/abcxyz/jvs-plugin-jira/pkg/validator"
 	jvspb "github.com/abcxyz/jvs/apis/v0"
 	"github.com/abcxyz/pkg/logging"
 	"github.com/abcxyz/pkg/testutil"
@@ -29,11 +28,11 @@ import (
 )
 
 type mockValidator struct {
-	result *validator.MatchResult
+	result *MatchResult
 	err    error
 }
 
-func (m *mockValidator) MatchIssue(ctx context.Context, issueKey string) (*validator.MatchResult, error) {
+func (m *mockValidator) MatchIssue(ctx context.Context, issueKey string) (*MatchResult, error) {
 	return m.result, m.err
 }
 
@@ -56,8 +55,8 @@ func TestPlugin_Validate(t *testing.T) {
 				},
 			},
 			validator: &mockValidator{
-				result: &validator.MatchResult{
-					Matches: []*validator.Match{
+				result: &MatchResult{
+					Matches: []*Match{
 						{
 							MatchedIssues: []int{1234},
 							Errors:        []string{},
@@ -83,8 +82,8 @@ func TestPlugin_Validate(t *testing.T) {
 				},
 			},
 			validator: &mockValidator{
-				result: &validator.MatchResult{
-					Matches: []*validator.Match{
+				result: &MatchResult{
+					Matches: []*Match{
 						{
 							MatchedIssues: []int{1234},
 							Errors:        []string{},
@@ -92,8 +91,7 @@ func TestPlugin_Validate(t *testing.T) {
 					},
 				},
 			},
-			want:    nil,
-			wantErr: "failed to perform validation, expected category \"github\" to be \"jira\"",
+			want: invalidErrResponse("failed to perform validation, expected category \"github\" to be \"jira\""),
 		},
 		{
 			name: "empty_matches",
@@ -104,12 +102,11 @@ func TestPlugin_Validate(t *testing.T) {
 				},
 			},
 			validator: &mockValidator{
-				result: &validator.MatchResult{
-					Matches: []*validator.Match{},
+				result: &MatchResult{
+					Matches: []*Match{},
 				},
 			},
-			want:    nil,
-			wantErr: "failed to get the matched jira issue \"ABCD\"",
+			want: invalidErrResponse("invalid jira justification \"ABCD\", ensure you input a valid jira id for an open issue"),
 		},
 		{
 			name: "empty_matchesIssue",
@@ -120,8 +117,8 @@ func TestPlugin_Validate(t *testing.T) {
 				},
 			},
 			validator: &mockValidator{
-				result: &validator.MatchResult{
-					Matches: []*validator.Match{
+				result: &MatchResult{
+					Matches: []*Match{
 						{
 							MatchedIssues: []int{},
 							Errors:        []string{},
@@ -129,8 +126,7 @@ func TestPlugin_Validate(t *testing.T) {
 					},
 				},
 			},
-			want:    nil,
-			wantErr: "failed to get the matched jira issue \"ABCD\"",
+			want: invalidErrResponse("invalid jira justification \"ABCD\", ensure you input a valid jira id for an open issue"),
 		},
 		{
 			name: "empty_value",
@@ -140,8 +136,8 @@ func TestPlugin_Validate(t *testing.T) {
 				},
 			},
 			validator: &mockValidator{
-				result: &validator.MatchResult{
-					Matches: []*validator.Match{
+				result: &MatchResult{
+					Matches: []*Match{
 						{
 							MatchedIssues: []int{1234},
 							Errors:        []string{},
@@ -149,8 +145,7 @@ func TestPlugin_Validate(t *testing.T) {
 					},
 				},
 			},
-			want:    nil,
-			wantErr: "empty justification value",
+			want: invalidErrResponse("empty justification value"),
 		},
 		{
 			name: "not_match_jql",
@@ -161,13 +156,9 @@ func TestPlugin_Validate(t *testing.T) {
 				},
 			},
 			validator: &mockValidator{
-				err: fmt.Errorf("non match"),
+				err: fmt.Errorf("non match: %w", errInvalidJustification),
 			},
-			want: &jvspb.ValidateJustificationResponse{
-				Valid: false,
-				Error: []string{"non match"},
-			},
-			wantErr: "failed to validate justification",
+			want: invalidErrResponse("invalid jira justification \"ABCD\", ensure you input a valid jira id for an open issue"),
 		},
 		{
 			name: "match_error",
@@ -178,13 +169,30 @@ func TestPlugin_Validate(t *testing.T) {
 				},
 			},
 			validator: &mockValidator{
-				err: fmt.Errorf("failed match"),
+				err: fmt.Errorf("non match"),
 			},
-			want: &jvspb.ValidateJustificationResponse{
-				Valid: false,
-				Error: []string{"failed match"},
+			want:    nil,
+			wantErr: internalErr("ABCD").Error(),
+		},
+		{
+			name: "multiple_matches",
+			req: &jvspb.ValidateJustificationRequest{
+				Justification: &jvspb.Justification{
+					Category: "jira",
+					Value:    "ABCD",
+				},
 			},
-			wantErr: "failed to validate justification",
+			validator: &mockValidator{
+				result: &MatchResult{
+					Matches: []*Match{
+						{
+							MatchedIssues: []int{1234, 5678, 6784},
+							Errors:        []string{},
+						},
+					},
+				},
+			},
+			want: invalidErrResponse("invalid jira justification \"ABCD\", ensure you input a valid jira id for an open issue"),
 		},
 	}
 

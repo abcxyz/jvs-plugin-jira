@@ -14,12 +14,13 @@
 
 // Package validator provides functions to validate jira issue against
 // validation criteria.
-package validator
+package plugin
 
 import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -136,7 +137,7 @@ func (v *Validator) jiraIssue(ctx context.Context, issueIDOrKey string) (*jiraIs
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.String(), nil)
 	if err != nil {
-		return nil, fmt.Errorf("failed to construct request: %w", err)
+		return nil, fmt.Errorf("failed to construct jira issue request: %w", err)
 	}
 
 	req.Header.Set("Accept", "application/json")
@@ -197,10 +198,16 @@ func (v *Validator) makeRequest(req *http.Request, respVal any) error {
 	}
 	defer resp.Body.Close()
 
-	if got, want := resp.StatusCode, http.StatusOK; got != want {
+	if resp.StatusCode >= http.StatusInternalServerError {
+		// Return ErrInternal if jira api returns http status code 5xx.
 		return fmt.Errorf(
-			"failed to make request to %s, expected response code %d to be %d",
-			req.URL.String(), got, want)
+			"failed to make request to %s, got response code %d: %w",
+			req.URL.String(), resp.StatusCode, err)
+	} else if resp.StatusCode >= http.StatusBadRequest {
+		// Return errInvalidJustification if jira api returns http status code 4xx.
+		return fmt.Errorf(
+			"failed to make request to %s, got response code %d: %w",
+			req.URL.String(), resp.StatusCode, errors.Join(errInvalidJustification, err))
 	}
 
 	r := io.LimitReader(resp.Body, jiraResponseSizeLimitBytes)
