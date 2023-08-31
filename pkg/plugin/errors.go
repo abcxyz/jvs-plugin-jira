@@ -17,6 +17,4 @@ package plugin
 
 import "fmt"
 
-var (
-	errInvalidJustification = fmt.Errorf("invalid justification")
-)
+var errInvalidJustification = fmt.Errorf("invalid justification")

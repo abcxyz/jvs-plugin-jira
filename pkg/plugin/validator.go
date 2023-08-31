@@ -91,7 +91,7 @@ type MatchResult struct {
 	Matches []*Match `json:"matches"`
 }
 
-// NewValidator creates a new
+// NewValidator creates a new validator.
 func NewValidator(baseURL, jql, account, apiToken string) (*Validator, error) {
 	u, err := url.Parse(baseURL)
 	if err != nil {
