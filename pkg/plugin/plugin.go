@@ -26,6 +26,7 @@ import (
 	secretmanager "cloud.google.com/go/secretmanager/apiv1"
 	"cloud.google.com/go/secretmanager/apiv1/secretmanagerpb"
 	jvspb "github.com/abcxyz/jvs/apis/v0"
+	"github.com/abcxyz/pkg/logging"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -79,6 +80,9 @@ func NewJiraPlugin(ctx context.Context, cfg *PluginConfig) (*JiraPlugin, error) 
 
 // Validate returns the validation result.
 func (j *JiraPlugin) Validate(ctx context.Context, req *jvspb.ValidateJustificationRequest) (*jvspb.ValidateJustificationResponse, error) {
+	logger := logging.FromContext(ctx)
+	logger.InfoContext(ctx, "This is a test log")
+
 	if got, want := req.Justification.Category, jiraCategory; got != want {
 		err := fmt.Errorf("failed to perform validation, expected category %q to be %q", got, want)
 		log.Printf("failed to validate jira justification: %v", err)

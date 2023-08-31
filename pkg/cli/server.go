@@ -84,7 +84,7 @@ func (c *ServerCommand) RunUnstarted(ctx context.Context, args []string) (*plugi
 	if err := c.cfg.Validate(); err != nil {
 		return nil, fmt.Errorf("invalid configuration: %w", err)
 	}
-	logger.InfoContext(ctx, "loaded configuration", "config", c.cfg)
+	logger.DebugContext(ctx, "loaded configuration", "config", c.cfg)
 
 	p, err := plugin.NewJiraPlugin(ctx, c.cfg)
 	if err != nil {
