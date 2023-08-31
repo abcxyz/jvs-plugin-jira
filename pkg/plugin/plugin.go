@@ -79,15 +79,13 @@ func NewJiraPlugin(ctx context.Context, cfg *PluginConfig) (*JiraPlugin, error) 
 // Validate returns the validation result.
 func (j *JiraPlugin) Validate(ctx context.Context, req *jvspb.ValidateJustificationRequest) (*jvspb.ValidateJustificationResponse, error) {
 	if got, want := req.Justification.Category, jiraCategory; got != want {
-		err := fmt.Errorf("failed to perform validation, expected category %q to be %q", got, want)
 		// TODO(https://github.com/abcxyz/jvs-plugin-jira/issues/48): log error details.
-		return invalidErrResponse(err.Error()), nil
+		return invalidErrResponse(fmt.Sprintf("failed to perform validation, expected category %q to be %q", got, want)), nil
 	}
 
 	if req.Justification.Value == "" {
-		err := errors.New("empty justification value")
 		// TODO(https://github.com/abcxyz/jvs-plugin-jira/issues/48): log error details.
-		return invalidErrResponse(err.Error()), nil
+		return invalidErrResponse("empty justification value"), nil
 	}
 
 	result, err := j.validateWithJiraEndpoint(ctx, req.Justification.Value)
