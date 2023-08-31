@@ -79,18 +79,18 @@ func NewJiraPlugin(ctx context.Context, cfg *PluginConfig) (*JiraPlugin, error) 
 // Validate returns the validation result.
 func (j *JiraPlugin) Validate(ctx context.Context, req *jvspb.ValidateJustificationRequest) (*jvspb.ValidateJustificationResponse, error) {
 	if got, want := req.Justification.Category, jiraCategory; got != want {
-		// TODO(https://github.com/abcxyz/jvs-plugin-jira/issues/48): log error details.
+		// TODO(#48): log error details.
 		return invalidErrResponse(fmt.Sprintf("failed to perform validation, expected category %q to be %q", got, want)), nil
 	}
 
 	if req.Justification.Value == "" {
-		// TODO(https://github.com/abcxyz/jvs-plugin-jira/issues/48): log error details.
+		// TODO(#48): log error details.
 		return invalidErrResponse("empty justification value"), nil
 	}
 
 	result, err := j.validateWithJiraEndpoint(ctx, req.Justification.Value)
 	if err != nil {
-		// TODO(https://github.com/abcxyz/jvs-plugin-jira/issues/48): log error details.
+		// TODO(#48): log error details.
 		if errors.Is(err, errInvalidJustification) {
 			return invalidErrResponse(
 					fmt.Sprintf("invalid jira justification %q, ensure you input a valid jira id for an open issue", req.Justification.Value)),
@@ -103,7 +103,7 @@ func (j *JiraPlugin) Validate(ctx context.Context, req *jvspb.ValidateJustificat
 	// The format for the Jira issue URL follows the pattern "https://your-domain.atlassian.net/browse/<issueKey>".
 	issueURL, err := url.JoinPath(j.issueBaseURL, "browse", req.Justification.Value)
 	if err != nil {
-		// TODO(https://github.com/abcxyz/jvs-plugin-jira/issues/48): log error details.
+		// TODO(#48): log error details.
 		return nil, internalErr(req.Justification.Value)
 	}
 
@@ -118,7 +118,7 @@ func (j *JiraPlugin) Validate(ctx context.Context, req *jvspb.ValidateJustificat
 }
 
 // Validates the justification with the jira endpoint.
-// TODO(https://github.com/abcxyz/jvs-plugin-jira/issues/46): move this function to j.validator.MatchIssue.
+// TODO(#46): move this function to j.validator.MatchIssue.
 func (j *JiraPlugin) validateWithJiraEndpoint(ctx context.Context, justificationValue string) (*Match, error) {
 	result, err := j.validator.MatchIssue(ctx, justificationValue)
 	if err != nil {
