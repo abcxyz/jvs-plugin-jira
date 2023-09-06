@@ -25,6 +25,8 @@ import (
 	"github.com/abcxyz/pkg/testutil"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type mockValidator struct {
@@ -106,7 +108,7 @@ func TestPlugin_Validate(t *testing.T) {
 					Matches: []*Match{},
 				},
 			},
-			want: invalidErrResponse("invalid jira justification \"ABCD\", ensure you input a valid jira id for an open issue"),
+			want: invalidErrResponse("no matched jira issue for justification \"ABCD\": invalid justification"),
 		},
 		{
 			name: "empty_matchesIssue",
@@ -126,7 +128,7 @@ func TestPlugin_Validate(t *testing.T) {
 					},
 				},
 			},
-			want: invalidErrResponse("invalid jira justification \"ABCD\", ensure you input a valid jira id for an open issue"),
+			want: invalidErrResponse("no matched jira issue for justification \"ABCD\": invalid justification"),
 		},
 		{
 			name: "empty_value",
@@ -158,7 +160,7 @@ func TestPlugin_Validate(t *testing.T) {
 			validator: &mockValidator{
 				err: fmt.Errorf("non match: %w", errInvalidJustification),
 			},
-			want: invalidErrResponse("invalid jira justification \"ABCD\", ensure you input a valid jira id for an open issue"),
+			want: invalidErrResponse("failed to match jira issue with justification \"ABCD\": non match: invalid justification"),
 		},
 		{
 			name: "match_error",
@@ -169,10 +171,10 @@ func TestPlugin_Validate(t *testing.T) {
 				},
 			},
 			validator: &mockValidator{
-				err: fmt.Errorf("non match"),
+				err: fmt.Errorf("unexpected error"),
 			},
 			want:    nil,
-			wantErr: internalErr("ABCD").Error(),
+			wantErr: status.Errorf(codes.Internal, "failed to match jira issue with justification \"ABCD\": unexpected error").Error(),
 		},
 		{
 			name: "multiple_matches",
@@ -192,7 +194,7 @@ func TestPlugin_Validate(t *testing.T) {
 					},
 				},
 			},
-			want: invalidErrResponse("invalid jira justification \"ABCD\", ensure you input a valid jira id for an open issue"),
+			want: invalidErrResponse("ambiguous justification \"ABCD\", multiple matching jira issues are found [1234 5678 6784]: invalid justification"),
 		},
 	}
 
