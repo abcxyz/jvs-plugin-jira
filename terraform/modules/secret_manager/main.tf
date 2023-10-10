@@ -27,7 +27,7 @@ resource "google_secret_manager_secret" "jira_api_token" {
   secret_id = var.secret_id
   labels    = var.labels
   replication {
-    automatic = true
+    auto {}
   }
 
   depends_on = [
