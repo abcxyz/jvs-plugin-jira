@@ -2,26 +2,40 @@
 
 **JVS-PLUGIN-JIRA is not an official Google product.**
 
-We leverage [goreleaser](https://goreleaser.com/) for SCM (GitHub) release.
+We leverage [goreleaser](https://goreleaser.com/) for SCM (GitHub) and image
+release.
 
 
 ## New Release
 
-1.   If a new JVS base image is needed, update [Dockerfile](https://github.com/abcxyz/jvs-plugin-jira/blob/main/Dockerfile)
+-   If a new JVS base image is needed, update [Dockerfile](https://github.com/abcxyz/jvs-plugin-jira/blob/main/Dockerfile)
 to point to a new JVS base image, and merge the PR.
 
-2.   Run the commands below to cut the release.
-
+-   Send a PR to update all dependencies For Go
 ```sh
-# The version you're going to release.
-REL_VER=v0.0.x
-
-# Tag
-git tag -f -a $REL_VER -m $REL_VER
-
-# Push tag. This will trigger the release workflow.
-git push origin $REL_VER
+go get -u && go mod tidy
 ```
+
+-   Create a tag using `.github/workflows/create-tag.yml` on default branch and
+     run the workflow with below inputs.
+
+    -   tag name with format `v0.x.x`, using semantic versioning.
+        -   If there are breaking changes, bump the major version.
+        -   If there are new major features (but not breaking), bump the minor
+            version.
+        -   Nothing important, bump the patch version.
+        -   Feel free to use suffixes -alpha, -beta and -rc as needed.
+    -   skip to use default message (tag name).
+
+-   The new tag created should trigger the release workflow which typically does
+    three things:
+
+    -   Integration test.
+    -   Container image release and push the images to container registry
+        `us-docker.pkg.dev/abcxyz-artifacts/docker-images`.
+    -   GitHub release with artifacts (e.g. code zip, binaries, etc.).
+        Note: Goreleaser will automatically use the git change log to fill the
+        release note.
 
 ## Manually Release Images
 
@@ -59,7 +73,7 @@ export DOCKER_TAG=mytag
 # Use goreleaser to build the images.
 # All the images will be tagged with the git tag given earlier.
 # Use --skip-validate flag if you are trying to release from a older commit.
-# To use a new JVS release, update the base image to a new version in 
+# To use a new JVS release, update the base image to a new version in
 # .goreleaser.docker.yaml.
 goreleaser release -f .goreleaser.docker.yaml --clean
 ```
