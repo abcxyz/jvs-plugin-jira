@@ -24,9 +24,10 @@ import (
 
 	secretmanager "cloud.google.com/go/secretmanager/apiv1"
 	"cloud.google.com/go/secretmanager/apiv1/secretmanagerpb"
-	jvspb "github.com/abcxyz/jvs/apis/v0"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+
+	jvspb "github.com/abcxyz/jvs/apis/v0"
 )
 
 const (

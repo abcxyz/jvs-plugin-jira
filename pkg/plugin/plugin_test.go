@@ -20,13 +20,14 @@ import (
 	"fmt"
 	"testing"
 
-	jvspb "github.com/abcxyz/jvs/apis/v0"
-	"github.com/abcxyz/pkg/logging"
-	"github.com/abcxyz/pkg/testutil"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+
+	jvspb "github.com/abcxyz/jvs/apis/v0"
+	"github.com/abcxyz/pkg/logging"
+	"github.com/abcxyz/pkg/testutil"
 )
 
 type mockValidator struct {

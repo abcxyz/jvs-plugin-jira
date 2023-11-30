@@ -18,9 +18,10 @@ package plugin
 import (
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
+
 	"github.com/abcxyz/pkg/cli"
 	"github.com/abcxyz/pkg/testutil"
-	"github.com/google/go-cmp/cmp"
 )
 
 func TestPluginConfig_ToFlags(t *testing.T) {
