@@ -19,11 +19,12 @@ import (
 	"context"
 	"fmt"
 
+	goplugin "github.com/hashicorp/go-plugin"
+
 	"github.com/abcxyz/jvs-plugin-jira/pkg/plugin"
 	jvspb "github.com/abcxyz/jvs/apis/v0"
 	"github.com/abcxyz/pkg/cli"
 	"github.com/abcxyz/pkg/logging"
-	goplugin "github.com/hashicorp/go-plugin"
 )
 
 type ServerCommand struct {
