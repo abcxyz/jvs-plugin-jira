@@ -26,7 +26,7 @@ module "jvs" {
 
   iap_support_email = "support@example.com"
 
-  jvs_container_image = "us-docker.pkg.dev/abcxyz-artifacts/docker-images/jvsctl:0.0.5-amd64"
+  jvs_container_image = "us-docker.pkg.dev/abcxyz-artifacts/docker-images/jvs-plugin-jira:0.0.1-amd64"
 
 
   # Specify the Email address where alert notifications send to.
