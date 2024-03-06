@@ -48,9 +48,8 @@ builds:
       - 'arm64'
 
 dockers:
-  -
-    ids:
-    - 'jvs-plugin-jira'
+  - ids:
+      - 'jvs-plugin-jira'
     use: 'buildx'
     goos: 'linux'
     goarch: 'amd64'
@@ -68,9 +67,8 @@ dockers:
       - '--label=org.opencontainers.image.title=jvs-plugin-jira'
       - '--label=org.opencontainers.image.version={{ .Version }}'
 
-  -
-    ids:
-    - 'jvs-plugin-jira'
+  - ids:
+      - 'jvs-plugin-jira'
     use: 'buildx'
     goos: 'linux'
     goarch: 'arm64'
