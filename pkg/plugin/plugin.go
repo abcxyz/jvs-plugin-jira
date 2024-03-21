@@ -79,15 +79,15 @@ func NewJiraPlugin(ctx context.Context, cfg *PluginConfig) (*JiraPlugin, error) 
 
 // Validate returns the validation result.
 func (j *JiraPlugin) Validate(ctx context.Context, req *jvspb.ValidateJustificationRequest) (*jvspb.ValidateJustificationResponse, error) {
-	if got, want := req.Justification.Category, jiraCategory; got != want {
+	if got, want := req.GetJustification().GetCategory(), jiraCategory; got != want {
 		return invalidErrResponse(fmt.Sprintf("failed to perform validation, expected category %q to be %q", got, want)), nil
 	}
 
-	if req.Justification.Value == "" {
+	if req.GetJustification().GetValue() == "" {
 		return invalidErrResponse("empty justification value"), nil
 	}
 
-	result, err := j.validateWithJiraEndpoint(ctx, req.Justification.Value)
+	result, err := j.validateWithJiraEndpoint(ctx, req.GetJustification().GetValue())
 	if err != nil {
 		if errors.Is(err, errInvalidJustification) {
 			return invalidErrResponse(err.Error()),
@@ -98,7 +98,7 @@ func (j *JiraPlugin) Validate(ctx context.Context, req *jvspb.ValidateJustificat
 	}
 	issueID := strconv.Itoa(result.MatchedIssues[0])
 	// The format for the Jira issue URL follows the pattern "https://your-domain.atlassian.net/browse/<issueKey>".
-	issueURL, err := url.JoinPath(j.issueBaseURL, "browse", req.Justification.Value)
+	issueURL, err := url.JoinPath(j.issueBaseURL, "browse", req.GetJustification().GetValue())
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
