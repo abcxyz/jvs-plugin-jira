@@ -122,8 +122,6 @@ func TestValidation(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		tc := tc
-
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
@@ -142,7 +140,7 @@ func TestValidation(t *testing.T) {
 			ctx := logging.WithLogger(context.Background(), logging.TestLogger(t))
 			got, err := validator.MatchIssue(ctx, "ABCD")
 			if diff := testutil.DiffErrString(err, tc.wantErr); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 			if diff := cmp.Diff(tc.want, got); diff != "" {
 				t.Errorf("Failed validation (-want,+got):\n%s", diff)

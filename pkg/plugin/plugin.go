@@ -93,14 +93,14 @@ func (j *JiraPlugin) Validate(ctx context.Context, req *jvspb.ValidateJustificat
 			return invalidErrResponse(err.Error()),
 				nil
 		} else {
-			return nil, status.Errorf(codes.Internal, err.Error())
+			return nil, status.Error(codes.Internal, err.Error())
 		}
 	}
 	issueID := strconv.Itoa(result.MatchedIssues[0])
 	// The format for the Jira issue URL follows the pattern "https://your-domain.atlassian.net/browse/<issueKey>".
 	issueURL, err := url.JoinPath(j.issueBaseURL, "browse", req.GetJustification().GetValue())
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, err.Error())
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 
 	return &jvspb.ValidateJustificationResponse{
