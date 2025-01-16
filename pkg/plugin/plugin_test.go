@@ -175,7 +175,7 @@ func TestPlugin_Validate(t *testing.T) {
 				err: fmt.Errorf("unexpected error"),
 			},
 			want:    nil,
-			wantErr: status.Errorf(codes.Internal, "failed to match jira issue with justification \"ABCD\": unexpected error").Error(),
+			wantErr: status.Error(codes.Internal, "failed to match jira issue with justification \"ABCD\": unexpected error").Error(),
 		},
 		{
 			name: "multiple_matches",
@@ -200,8 +200,6 @@ func TestPlugin_Validate(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		tc := tc
-
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
@@ -213,7 +211,7 @@ func TestPlugin_Validate(t *testing.T) {
 			ctx := logging.WithLogger(context.Background(), logging.TestLogger(t))
 			got, err := p.Validate(ctx, tc.req)
 			if diff := testutil.DiffErrString(err, tc.wantErr); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 			if diff := cmp.Diff(tc.want, got, cmpopts.IgnoreUnexported(jvspb.ValidateJustificationResponse{})); diff != "" {
 				t.Errorf("Failed validation (-want,+got):\n%s", diff)
@@ -247,8 +245,6 @@ func TestPlugin_GetUIData(t *testing.T) {
 	}
 
 	for _, tc := range cases {
-		tc := tc
-
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
@@ -259,7 +255,7 @@ func TestPlugin_GetUIData(t *testing.T) {
 			ctx := logging.WithLogger(context.Background(), logging.TestLogger(t))
 			got, err := p.GetUIData(ctx, tc.req)
 			if diff := testutil.DiffErrString(err, tc.wantErr); diff != "" {
-				t.Errorf(diff)
+				t.Error(diff)
 			}
 			if diff := cmp.Diff(tc.want, got, cmpopts.IgnoreUnexported(jvspb.UIData{})); diff != "" {
 				t.Errorf("Failed GetUIData (-want,+got):\n%s", diff)
