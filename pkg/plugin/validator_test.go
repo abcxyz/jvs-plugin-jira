@@ -15,7 +15,6 @@
 package plugin
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -137,7 +136,7 @@ func TestValidation(t *testing.T) {
 				t.Fatalf("failed to create validator: %v", err)
 			}
 
-			ctx := logging.WithLogger(context.Background(), logging.TestLogger(t))
+			ctx := logging.WithLogger(t.Context(), logging.TestLogger(t))
 			got, err := validator.MatchIssue(ctx, "ABCD")
 			if diff := testutil.DiffErrString(err, tc.wantErr); diff != "" {
 				t.Error(diff)
