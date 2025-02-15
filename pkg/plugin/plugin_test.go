@@ -208,7 +208,7 @@ func TestPlugin_Validate(t *testing.T) {
 				issueBaseURL: "https://example.atlassian.net",
 			}
 
-			ctx := logging.WithLogger(context.Background(), logging.TestLogger(t))
+			ctx := logging.WithLogger(t.Context(), logging.TestLogger(t))
 			got, err := p.Validate(ctx, tc.req)
 			if diff := testutil.DiffErrString(err, tc.wantErr); diff != "" {
 				t.Error(diff)
@@ -252,7 +252,7 @@ func TestPlugin_GetUIData(t *testing.T) {
 				uiData: tc.uiData,
 			}
 
-			ctx := logging.WithLogger(context.Background(), logging.TestLogger(t))
+			ctx := logging.WithLogger(t.Context(), logging.TestLogger(t))
 			got, err := p.GetUIData(ctx, tc.req)
 			if diff := testutil.DiffErrString(err, tc.wantErr); diff != "" {
 				t.Error(diff)
